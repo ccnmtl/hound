@@ -1,0 +1,27 @@
+{
+"GraphiteBase": "http://nanny.cul.columbia.edu/render/",
+"EmailFrom": "anders@columbia.edu",
+"EmailTo": "anders@columbia.edu",
+"CheckInterval": 5,
+"GlobalThrottle": 10,
+"Alerts": [
+  {
+  "Name": "Capsim Smoketests Failed",
+	"Metric": "ccnmtl.app.smoketest.capsim.failed",
+	"Threshold": 0.5,
+	"Direction": "above"
+  },
+  {
+  "Name": "Capsim Smoketests Passed",
+	"Metric": "ccnmtl.app.smoketest.capsim.passed",
+	"Threshold": 0.5,
+	"Direction": "below" 
+	},
+  {
+  "Name": "MVSim Smoketests Failed",
+	"Metric": "ccnmtl.app.smoketest.mvsim.failed",
+	"Threshold": 0.5,
+	"Direction": "above" 
+	}
+]
+}

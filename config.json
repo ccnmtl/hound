@@ -1,6 +1,6 @@
 {
 "GraphiteBase": "http://nanny.cul.columbia.edu/render/",
-"EmailFrom": "anders@columbia.edu",
+"EmailFrom": "hound@ccnmtl.columbia.edu",
 "EmailTo": "anders@columbia.edu",
 "CheckInterval": 5,
 "GlobalThrottle": 10,

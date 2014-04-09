@@ -57,9 +57,9 @@ func (ac *AlertsCollection) ProcessAll() {
 			EMAIL_FROM,
 			EMAIL_TO,
 			"[ALERT] Hound is throttled",
-			fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n" +
-			"This probably indicates an infrastructure problem (network, graphite, etc)", alerts_sent,
-			GLOBAL_THROTTLE))
+			fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
+				"This probably indicates an infrastructure problem (network, graphite, etc)", alerts_sent,
+				GLOBAL_THROTTLE))
 	}
 }
 
@@ -71,10 +71,8 @@ func (ac *AlertsCollection) Run() {
 	}
 }
 
-
 func (ac *AlertsCollection) DisplayAll() {
 	for _, a := range ac.Alerts {
 		fmt.Println(a)
 	}
 }
-

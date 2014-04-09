@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	GRAPHITE_BASE string
-	EMAIL_FROM string
-	EMAIL_TO string
-	CHECK_INTERVAL int
+	GRAPHITE_BASE   string
+	EMAIL_FROM      string
+	EMAIL_TO        string
+	CHECK_INTERVAL  int
 	GLOBAL_THROTTLE int
 )
 
@@ -22,15 +22,15 @@ func main() {
 	flag.Parse()
 
 	file, err := ioutil.ReadFile(configfile)
-  if err != nil {
-    log.Fatal(err)
-  }
+	if err != nil {
+		log.Fatal(err)
+	}
 
-  f := ConfigData{}
-  err = json.Unmarshal(file, &f)
-  if err != nil {
-    log.Fatal(err)
-  }
+	f := ConfigData{}
+	err = json.Unmarshal(file, &f)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// set global values
 	GRAPHITE_BASE = f.GraphiteBase
@@ -48,4 +48,3 @@ func main() {
 	// kick it off
 	ac.Run()
 }
-

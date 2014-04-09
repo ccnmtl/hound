@@ -24,8 +24,8 @@ import (
 	"errors"
 	"io"
 	"net"
-	"net/textproto"
 	"net/smtp"
+	"net/textproto"
 	"strings"
 )
 
@@ -286,18 +286,18 @@ func SendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) er
 	if err = c.hello(); err != nil {
 		return err
 	}
-  host, _, _ := net.SplitHostPort(addr) 
-  config := &tls.Config{ 
-    InsecureSkipVerify: true, 
-    ServerName:         host, 
-  } 
-  if err = c.StartTLS(config); err != nil { 
+	host, _, _ := net.SplitHostPort(addr)
+	config := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         host,
+	}
+	if err = c.StartTLS(config); err != nil {
 		if err = c.StartTLS(nil); err != nil {
 			return err
 		}
 	}
-	if a != nil { 
-    if ok, _ := c.Extension("AUTH"); ok { 
+	if a != nil {
+		if ok, _ := c.Extension("AUTH"); ok {
 			if err = c.Auth(a); err != nil {
 				return err
 			}

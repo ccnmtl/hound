@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/mail"
 	"net/smtp"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -104,7 +104,15 @@ func (a *Alert) RecoveryEmailSubject() string {
 }
 
 func (a *Alert) RecoveryEmailBody() string {
-	return fmt.Sprintf("%s [%s] has returned %s %f", a.Name, a.Metric, a.Direction, a.Threshold)
+	return fmt.Sprintf("%s [%s] has returned %s %f", a.Name, a.Metric, invertDirection(a.Direction), a.Threshold)
+}
+
+func invertDirection(d string) string {
+	if d == "above" {
+		return "below"
+	} else {
+		return "above"
+	}
 }
 
 func (a *Alert) Throttled() bool {
@@ -176,4 +184,3 @@ func backoff_time(level int) time.Duration {
 	}
 	return backoff_durations[level]
 }
-

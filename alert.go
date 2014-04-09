@@ -35,11 +35,11 @@ func (a Alert) Url() string {
 }
 
 func (a Alert) DailyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" + a.Metric + "&width=800&height=300&from=-24hours"
+	return GRAPHITE_BASE + "?target=" + a.Metric + "&target=threshold(" + fmt.Sprintf("%f", a.Threshold) + ")&width=800&height=300&from=-24hours"
 }
 
 func (a Alert) WeeklyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" + a.Metric + "&width=800&height=300&from=-7days"
+	return GRAPHITE_BASE + "?target=" + a.Metric + "&target=threshold(" + fmt.Sprintf("%f", a.Threshold) + ")&width=800&height=300&from=-7days"
 }
 
 func (a *Alert) Fetch() (float64, error) {

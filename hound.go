@@ -3,8 +3,11 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 var (
@@ -45,6 +48,18 @@ func main() {
 		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction))
 	}
 
-	// kick it off
-	ac.Run()
+	// kick it off in the background
+	go ac.Run()
+
+	http.HandleFunc("/",
+		func(w http.ResponseWriter, r *http.Request) {
+			pr := ac.MakePageResponse()
+
+			t, err := template.ParseFiles(f.TemplateFile)
+			if err != nil {
+				fmt.Println(fmt.Sprintf("%v", err))
+			}
+			t.Execute(w, pr)
+		})
+	log.Fatal(http.ListenAndServe(":"+f.HttpPort, nil))
 }

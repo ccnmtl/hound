@@ -4,7 +4,16 @@
 "EmailTo": "anders@columbia.edu",
 "CheckInterval": 5,
 "GlobalThrottle": 10,
+"HttpPort": "9999",
+"TemplateFile": "index.html",
 "Alerts": [
+  {
+  "Name": "Otto Load Avg",
+        "Metric": "ccnmtl.server.otto.cpu.load_average.1_minute",
+        "Threshold": 3.0,
+        "Direction": "above"
+  },
+
   {
   "Name": "Capsim Smoketests Failed",
 	"Metric": "ccnmtl.app.smoketest.capsim.failed",

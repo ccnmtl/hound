@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+type PageResponse struct {
+	Alerts []*Alert
+}
+
 type AlertsCollection struct {
 	Alerts []*Alert
 }
@@ -75,4 +79,12 @@ func (ac *AlertsCollection) DisplayAll() {
 	for _, a := range ac.Alerts {
 		fmt.Println(a)
 	}
+}
+
+func (ac *AlertsCollection) MakePageResponse() PageResponse {
+	pr := PageResponse{}
+	for _, a := range ac.Alerts {
+		pr.Alerts = append(pr.Alerts, a)
+	}
+	return pr
 }

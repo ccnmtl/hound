@@ -1,0 +1,27 @@
+<html>
+<head><title>Hound</title>
+<style type="text/css">
+tr.OK th { background-color: #ccffcc; }
+tr.Failed th { background-color: #ffcccc; }
+tr.Error th { background-color: #ffddcc; }
+th { vertical-align: top; }
+</style>
+</head>
+<body>
+
+<h1>Hound</h1>
+
+<table>
+
+{{ range .Alerts }}
+<tr class="{{ .Status }}">
+	<th>{{ .Name }}</th>
+	<td>
+<img src="{{.DailyGraphUrl}}" />
+<img src="{{.WeeklyGraphUrl}}" />
+</td>
+</tr>
+{{ end }}
+
+</body>
+</html>

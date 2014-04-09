@@ -13,5 +13,7 @@ type ConfigData struct {
 	EmailTo        string
 	CheckInterval  int
 	GlobalThrottle int
+	HttpPort       string
+	TemplateFile   string
 	Alerts         []AlertData
 }

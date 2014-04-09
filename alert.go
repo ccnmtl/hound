@@ -34,6 +34,14 @@ func (a Alert) Url() string {
 	return GRAPHITE_BASE + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-10mins"
 }
 
+func (a Alert) DailyGraphUrl() string {
+	return GRAPHITE_BASE + "?target=" + a.Metric + "&width=500&height=100&from=-24hours"
+}
+
+func (a Alert) WeeklyGraphUrl() string {
+	return GRAPHITE_BASE + "?target=" + a.Metric + "&width=500&height=100&from=-7days"
+}
+
 func (a *Alert) Fetch() (float64, error) {
 	resp, err := http.Get(a.Url())
 	if err != nil {
@@ -134,8 +142,8 @@ func (a *Alert) AlertEmailSubject() string {
 }
 
 func (a *Alert) AlertEmailBody() string {
-	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus\t%s\nMessage:\t%s",
-		a.Name, a.Metric, a.Status, a.Message)
+	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: %s\nWeekly Graph: %s\n",
+		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl())
 }
 
 func extractLastValue(raw_response string) (float64, error) {

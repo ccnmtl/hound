@@ -31,11 +31,15 @@ func (ac *AlertsCollection) ProcessAll() {
 	// fetch/calculate new status for all
 	ac.CheckAll()
 	alerts_sent := 0
+	recoveries_sent := 0
 	for _, a := range ac.Alerts {
 		if a.Status == "OK" {
 			if a.PreviousStatus != "OK" {
 				// this one has recovered. need to send a message
-				a.SendRecoveryMessage()
+				if recoveries_sent < GLOBAL_THROTTLE {
+					a.SendRecoveryMessage()
+				}
+				recoveries_sent++
 			}
 			// everything is peachy
 		} else {
@@ -62,6 +66,16 @@ func (ac *AlertsCollection) ProcessAll() {
 			"[ALERT] Hound is throttled",
 			fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
 				"This probably indicates an infrastructure problem (network, graphite, etc)", alerts_sent,
+				GLOBAL_THROTTLE))
+	}
+
+	if recoveries_sent >= GLOBAL_THROTTLE {
+		simpleSendMail(
+			EMAIL_FROM,
+			EMAIL_TO,
+			"[ALERT] Hound is recovered",
+			fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
+				recoveries_sent,
 				GLOBAL_THROTTLE))
 	}
 }

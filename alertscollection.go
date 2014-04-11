@@ -43,13 +43,12 @@ func (ac *AlertsCollection) ProcessAll() {
 			// we need to send a message
 			if a.Throttled() {
 				// wait for the throttling to expire
-				fmt.Println("throttling...")
 			} else {
 				if alerts_sent < GLOBAL_THROTTLE {
 					a.SendAlert()
-					a.Backoff = a.Backoff + 1
-					a.LastAlerted = time.Now()
 				}
+				a.Backoff = a.Backoff + 1
+				a.LastAlerted = time.Now()
 				alerts_sent++
 			}
 		}

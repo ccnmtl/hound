@@ -34,7 +34,7 @@ func (ac *AlertsCollection) ProcessAll() {
 	recoveries_sent := 0
 	for _, a := range ac.Alerts {
 		if a.Status == "OK" {
-			if a.PreviousStatus != "OK" {
+			if a.PreviousStatus == "Failed" {
 				// this one has recovered. need to send a message
 				if recoveries_sent < GLOBAL_THROTTLE {
 					a.SendRecoveryMessage()
@@ -42,13 +42,14 @@ func (ac *AlertsCollection) ProcessAll() {
 				recoveries_sent++
 			}
 			// everything is peachy
+			a.Backoff = 0
 		} else {
 			// this one is broken. if we're not in a backoff period
 			// we need to send a message
 			if a.Throttled() {
 				// wait for the throttling to expire
 			} else {
-				if alerts_sent < GLOBAL_THROTTLE {
+				if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
 					a.SendAlert()
 				}
 				a.Backoff = a.Backoff + 1

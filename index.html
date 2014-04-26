@@ -5,20 +5,39 @@ tr.OK th { background-color: #ccffcc; }
 tr.Failed th { background-color: #ffcccc; }
 tr.Error th { background-color: #ffddcc; }
 th { vertical-align: top; }
+a.box {
+   display: block;
+   float: left;
+   width: 10px;
+   height: 10px;
+}
+
+a.OK { background-color: #cfc;}
+a.Failed { background-color: #fcc;}
+a.Error { background-color: #fdc;}
+
 </style>
 </head>
 <body>
 
 <h1>Hound</h1>
 
+<div style="width: 800px">
+{{ range $index, $element := .Alerts }}
+<a class="box {{$element.Status}}" href="#alert-{{$index}}"></a>
+{{ end }}
+</div>
+
+<br style="clear: both" />
+
 <table>
 
-{{ range .Alerts }}
-<tr class="{{ .Status }}">
-	<th>{{ .Name }}</th>
+{{ range $index, $element := .Alerts }}
+<tr class="{{ $element.Status }}">
+	<th><a name="alert-{{$index}}">{{ $element.Name }}</a></th>
 	<td>
-<img src="{{.DailyGraphUrl}}" width="800" height="150" />
-<img src="{{.WeeklyGraphUrl}}" width="800" height="75" />
+<img src="{{$element.DailyGraphUrl}}" width="800" height="150" />
+<img src="{{$element.WeeklyGraphUrl}}" width="800" height="75" />
 </td>
 </tr>
 {{ end }}

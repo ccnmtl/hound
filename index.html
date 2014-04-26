@@ -10,11 +10,13 @@ a.box {
    float: left;
    width: 10px;
    height: 10px;
+   margin: 1px;
+   border: 1px solid black;
 }
 
-a.OK { background-color: #cfc;}
-a.Failed { background-color: #fcc;}
-a.Error { background-color: #fdc;}
+a.OK { background-color: #0f0;}
+a.Failed { background-color: #f00;}
+a.Error { background-color: #f60;}
 
 </style>
 </head>
@@ -22,15 +24,19 @@ a.Error { background-color: #fdc;}
 
 <h1>Hound</h1>
 
-<div style="width: 800px">
+<table>
+
+<tr>
+	<th>Summary</th>
+
+	<td>
 {{ range $index, $element := .Alerts }}
 <a class="box {{$element.Status}}" href="#alert-{{$index}}"></a>
 {{ end }}
-</div>
-
 <br style="clear: both" />
+</td>
+</tr>
 
-<table>
 
 {{ range $index, $element := .Alerts }}
 <tr class="{{ $element.Status }}">

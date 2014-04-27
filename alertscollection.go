@@ -33,6 +33,7 @@ func (ac *AlertsCollection) ProcessAll() {
 	alerts_sent := 0
 	recoveries_sent := 0
 	errors := 0
+	failures := 0
 	errored_alerts := make([]*Alert, 0)
 
 	for _, a := range ac.Alerts {
@@ -52,16 +53,18 @@ func (ac *AlertsCollection) ProcessAll() {
 			if a.Status == "Error" {
 				errors++
 				errored_alerts = append(errored_alerts, a)
+			} else {
+				failures++
 			}
 			if a.Throttled() {
 				// wait for the throttling to expire
 			} else {
 				if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
 					a.SendAlert()
+					alerts_sent++
 				}
 				a.Backoff = a.Backoff + 1
 				a.LastAlerted = time.Now()
-				alerts_sent++
 			}
 		}
 		// cycle the previous status
@@ -73,7 +76,7 @@ func (ac *AlertsCollection) ProcessAll() {
 			EMAIL_TO,
 			"[ALERT] Hound is throttled",
 			fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
-				"This probably indicates an infrastructure problem (network, graphite, etc)", alerts_sent,
+				"This probably indicates an infrastructure problem (network, graphite, etc)", failures,
 				GLOBAL_THROTTLE))
 	}
 

@@ -93,6 +93,12 @@ func (a *Alert) CheckMetric() bool {
 	if err != nil {
 		return false
 	}
+	a.UpdateStatus(lv)
+	return a.Status == "OK"
+
+}
+
+func (a *Alert) UpdateStatus(lv float64) {
 	if a.Direction == "above" {
 		// pass if metric is below the threshold
 		if lv < a.Threshold {
@@ -112,7 +118,6 @@ func (a *Alert) CheckMetric() bool {
 			a.Message = fmt.Sprintf("%f <= %f", lv, a.Threshold)
 		}
 	}
-	return a.Status == "OK"
 }
 
 func (a Alert) String() string {

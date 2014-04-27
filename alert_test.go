@@ -82,5 +82,25 @@ func Test_extractLastValue(t *testing.T) {
 	if v != 0.0 {
 		t.Error("should return 0")
 	}
+}
 
+func Test_UpdateStatus(t *testing.T) {
+	a := NewAlert("foo", "foo", 10, "above")
+	a.UpdateStatus(11.0)
+	if a.Status != "Failed" {
+		t.Error("should've failed")
+	}
+	a.UpdateStatus(9.0)
+	if a.Status != "OK" {
+		t.Error("should've passed")
+	}
+	a.Direction = "below"
+	a.UpdateStatus(11.0)
+	if a.Status != "OK" {
+		t.Error("should've passed")
+	}
+	a.UpdateStatus(9.0)
+	if a.Status != "Failed" {
+		t.Error("should've failed")
+	}
 }

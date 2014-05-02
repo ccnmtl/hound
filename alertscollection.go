@@ -90,14 +90,22 @@ func (ac *AlertsCollection) ProcessAll() {
 				GLOBAL_THROTTLE))
 	}
 	if errors > 0 {
-		simpleSendMail(
-			EMAIL_FROM,
-			EMAIL_TO,
-			"[ERROR] Hound encountered errors",
-			fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+
+		d := backoff_time(GLOBAL_BACKOFF)
+		window := LAST_ERROR_EMAIL.Add(d)
+		if time.Now().After(window) {
+			simpleSendMail(
+				EMAIL_FROM,
+				EMAIL_TO,
+				"[ERROR] Hound encountered errors",
+				fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+
 				"means that Graphite has fallen behind. It doesn't necessarily mean "+
 				"that there are problems with the services, but it means that Hound "+
 				"is temporarily blind wrt these metrics.", errors))
+			LAST_ERROR_EMAIL = time.Now()
+		}
+		GLOBAL_BACKOFF++
+	} else {
+		GLOBAL_BACKOFF = 0
 	}
 }
 

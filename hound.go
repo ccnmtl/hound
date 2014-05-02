@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 var (
@@ -16,6 +17,8 @@ var (
 	EMAIL_TO        string
 	CHECK_INTERVAL  int
 	GLOBAL_THROTTLE int
+	GLOBAL_BACKOFF int
+	LAST_ERROR_EMAIL time.Time
 )
 
 func main() {
@@ -41,6 +44,8 @@ func main() {
 	EMAIL_TO = f.EmailTo
 	CHECK_INTERVAL = f.CheckInterval
 	GLOBAL_THROTTLE = f.GlobalThrottle
+	GLOBAL_BACKOFF = 0
+	LAST_ERROR_EMAIL = time.Now()
 
 	// initialize all the alerts
 	ac := NewAlertsCollection()

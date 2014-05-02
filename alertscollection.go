@@ -102,8 +102,8 @@ func (ac *AlertsCollection) ProcessAll() {
 				"that there are problems with the services, but it means that Hound "+
 				"is temporarily blind wrt these metrics.", errors))
 			LAST_ERROR_EMAIL = time.Now()
+			GLOBAL_BACKOFF++
 		}
-		GLOBAL_BACKOFF++
 	} else {
 		GLOBAL_BACKOFF = 0
 	}

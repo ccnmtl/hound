@@ -12,12 +12,14 @@ import (
 )
 
 var (
-	GRAPHITE_BASE   string
-	EMAIL_FROM      string
-	EMAIL_TO        string
-	CHECK_INTERVAL  int
-	GLOBAL_THROTTLE int
-	GLOBAL_BACKOFF int
+	GRAPHITE_BASE    string
+	CARBON_BASE      string
+	METRIC_BASE      string
+	EMAIL_FROM       string
+	EMAIL_TO         string
+	CHECK_INTERVAL   int
+	GLOBAL_THROTTLE  int
+	GLOBAL_BACKOFF   int
 	LAST_ERROR_EMAIL time.Time
 )
 
@@ -40,6 +42,8 @@ func main() {
 
 	// set global values
 	GRAPHITE_BASE = f.GraphiteBase
+	CARBON_BASE = f.CarbonBase
+	METRIC_BASE = f.MetricBase
 	EMAIL_FROM = f.EmailFrom
 	EMAIL_TO = f.EmailTo
 	CHECK_INTERVAL = f.CheckInterval

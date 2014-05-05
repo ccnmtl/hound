@@ -9,6 +9,8 @@ type AlertData struct {
 
 type ConfigData struct {
 	GraphiteBase   string
+	CarbonBase     string
+	MetricBase     string
 	EmailFrom      string
 	EmailTo        string
 	CheckInterval  int

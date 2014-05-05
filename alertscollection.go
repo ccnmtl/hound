@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"net"
 	"time"
 )
 
@@ -35,9 +37,11 @@ func (ac *AlertsCollection) ProcessAll() {
 	errors := 0
 	failures := 0
 	errored_alerts := make([]*Alert, 0)
+	successes := 0
 
 	for _, a := range ac.Alerts {
 		if a.Status == "OK" {
+			successes++
 			if a.PreviousStatus == "Failed" {
 				// this one has recovered. need to send a message
 				if recoveries_sent < GLOBAL_THROTTLE {
@@ -98,15 +102,31 @@ func (ac *AlertsCollection) ProcessAll() {
 				EMAIL_TO,
 				"[ERROR] Hound encountered errors",
 				fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+
-				"means that Graphite has fallen behind. It doesn't necessarily mean "+
-				"that there are problems with the services, but it means that Hound "+
-				"is temporarily blind wrt these metrics.", errors))
+					"means that Graphite has fallen behind. It doesn't necessarily mean "+
+					"that there are problems with the services, but it means that Hound "+
+					"is temporarily blind wrt these metrics.", errors))
 			LAST_ERROR_EMAIL = time.Now()
 			GLOBAL_BACKOFF++
 		}
 	} else {
 		GLOBAL_BACKOFF = 0
 	}
+	var clientGraphite net.Conn
+	clientGraphite, err := net.Dial("tcp", CARBON_BASE)
+	if err != nil || clientGraphite == nil {
+		return
+	}
+	defer clientGraphite.Close()
+	now := int32(time.Now().Unix())
+	buffer := bytes.NewBufferString("")
+
+	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", METRIC_BASE, alerts_sent, now)
+	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", METRIC_BASE, recoveries_sent, now)
+	fmt.Fprintf(buffer, "%sfailures %d %d\n", METRIC_BASE, failures, now)
+	fmt.Fprintf(buffer, "%serrors %d %d\n", METRIC_BASE, errors, now)
+	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", METRIC_BASE, successes, now)
+	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", METRIC_BASE, GLOBAL_BACKOFF, now)
+	clientGraphite.Write(buffer.Bytes())
 }
 
 func (ac *AlertsCollection) Run() {

@@ -112,6 +112,10 @@ func (ac *AlertsCollection) ProcessAll() {
 	} else {
 		GLOBAL_BACKOFF = 0
 	}
+	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
+}
+
+func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int) {
 	var clientGraphite net.Conn
 	clientGraphite, err := net.Dial("tcp", CARBON_BASE)
 	if err != nil || clientGraphite == nil {

@@ -38,7 +38,6 @@ func (ac *AlertsCollection) ProcessAll() {
 	recoveries_sent := 0
 	errors := 0
 	failures := 0
-	errored_alerts := make([]*Alert, 0)
 	successes := 0
 
 	for _, a := range ac.Alerts {
@@ -48,9 +47,6 @@ func (ac *AlertsCollection) ProcessAll() {
 		errors = errors + e
 		failures = failures + f
 		alerts_sent = alerts_sent + as
-		if e > 0 {
-			errored_alerts = append(errored_alerts, a)
-		}
 	}
 	if alerts_sent >= GLOBAL_THROTTLE {
 		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE)

@@ -68,7 +68,7 @@ func (ac *AlertsCollection) ProcessAll() {
 					a.SendAlert()
 					alerts_sent++
 				}
-				a.Backoff = a.Backoff + 1
+				a.Backoff = intmin(a.Backoff + 1, 6)
 				a.LastAlerted = time.Now()
 			}
 		}
@@ -107,7 +107,7 @@ func (ac *AlertsCollection) ProcessAll() {
 					"that there are problems with the services, but it means that Hound "+
 					"is temporarily blind wrt these metrics.", errors))
 			LAST_ERROR_EMAIL = time.Now()
-			GLOBAL_BACKOFF++
+			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF + 1, 6)
 		}
 	} else {
 		GLOBAL_BACKOFF = 0
@@ -128,6 +128,13 @@ func (ac *AlertsCollection) ProcessAll() {
 	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", METRIC_BASE, successes, now)
 	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", METRIC_BASE, GLOBAL_BACKOFF, now)
 	clientGraphite.Write(buffer.Bytes())
+}
+
+func intmin(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func (ac *AlertsCollection) Run() {

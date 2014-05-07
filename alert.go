@@ -23,6 +23,7 @@ type Alert struct {
 	Status         string
 	Message        string
 	PreviousStatus string
+	Fetcher        Fetcher
 }
 
 var WINDOW = "10mins"
@@ -36,8 +37,8 @@ var WEEKLY_BGCOLOR = "EEEEEE"
 var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, threshold float64,
-	direction string) *Alert {
-	return &Alert{name, metric, threshold, direction, 0, time.Now(), "OK", "", "OK"}
+	direction string, fetcher Fetcher) *Alert {
+	return &Alert{name, metric, threshold, direction, 0, time.Now(), "OK", "", "OK", fetcher}
 }
 
 func (a Alert) Url() string {
@@ -66,8 +67,18 @@ func (a Alert) WeeklyGraphUrl() string {
 		"&hideGrid=true&colorList=" + WEEKLY_COLORLIST + "&from=-7days"
 }
 
+type Fetcher interface {
+	Get(string) (*http.Response, error)
+}
+
+type HTTPFetcher struct {}
+
+func (h HTTPFetcher) Get(url string) (*http.Response, error) {
+	return http.Get(url)
+}
+
 func (a *Alert) Fetch() (float64, error) {
-	resp, err := http.Get(a.Url())
+	resp, err := a.Fetcher.Get(a.Url())
 	if err != nil {
 		a.Status = "Error"
 		a.Message = "graphite request failed"

@@ -54,7 +54,7 @@ func main() {
 	// initialize all the alerts
 	ac := NewAlertsCollection(SMTPEmailer{})
 	for _, a := range f.Alerts {
-		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction))
+		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction, HTTPFetcher{}))
 	}
 
 	// kick it off in the background

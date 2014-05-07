@@ -175,6 +175,19 @@ func (a *Alert) AlertEmailBody() string {
 		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl())
 }
 
+func (a *Alert) StateOK(recoveries_sent int) int {
+	if a.PreviousStatus == "Failed" {
+		// this one has recovered. need to send a message
+		if recoveries_sent < GLOBAL_THROTTLE {
+			a.SendRecoveryMessage()
+		}
+		return 1
+	}
+	// everything is peachy
+	a.Backoff = 0
+	return 0
+}
+
 func extractLastValue(raw_response string) (float64, error) {
 	// just take the most recent value
 	parts := strings.Split(strings.Trim(raw_response, "\n\t "), ",")

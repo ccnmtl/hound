@@ -41,20 +41,10 @@ func (ac *AlertsCollection) ProcessAll() {
 	errored_alerts := make([]*Alert, 0)
 	successes := 0
 
-	e := ac.Emailer
-
 	for _, a := range ac.Alerts {
 		if a.Status == "OK" {
 			successes++
-			if a.PreviousStatus == "Failed" {
-				// this one has recovered. need to send a message
-				if recoveries_sent < GLOBAL_THROTTLE {
-					a.SendRecoveryMessage()
-				}
-				recoveries_sent++
-			}
-			// everything is peachy
-			a.Backoff = 0
+			recoveries_sent = recoveries_sent + a.StateOK(recoveries_sent)
 		} else {
 			// this one is broken. if we're not in a backoff period
 			// we need to send a message
@@ -79,24 +69,28 @@ func (ac *AlertsCollection) ProcessAll() {
 		a.PreviousStatus = a.Status
 	}
 	if alerts_sent >= GLOBAL_THROTTLE {
-		e.Throttled(failures, GLOBAL_THROTTLE)
+		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE)
 	}
 
 	if recoveries_sent >= GLOBAL_THROTTLE {
-		e.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE)
+		ac.Emailer.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE)
 	}
+	ac.HandleErrors(errors)
+	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
+}
+
+func (ac *AlertsCollection) HandleErrors(errors int) {
 	if errors > 0 {
 		d := backoff_time(GLOBAL_BACKOFF)
 		window := LAST_ERROR_EMAIL.Add(d)
 		if time.Now().After(window) {
-			e.EncounteredErrors(errors)
+			ac.Emailer.EncounteredErrors(errors)
 			LAST_ERROR_EMAIL = time.Now()
 			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
 		}
 	} else {
 		GLOBAL_BACKOFF = 0
 	}
-	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
 }
 
 func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int) {

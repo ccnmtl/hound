@@ -13,11 +13,12 @@ type PageResponse struct {
 }
 
 type AlertsCollection struct {
-	Alerts []*Alert
+	Alerts  []*Alert
+	Emailer Emailer
 }
 
-func NewAlertsCollection() *AlertsCollection {
-	return &AlertsCollection{}
+func NewAlertsCollection(e Emailer) *AlertsCollection {
+	return &AlertsCollection{Emailer: e}
 }
 
 func (ac *AlertsCollection) AddAlert(a *Alert) {
@@ -39,6 +40,8 @@ func (ac *AlertsCollection) ProcessAll() {
 	failures := 0
 	errored_alerts := make([]*Alert, 0)
 	successes := 0
+
+	e := ac.Emailer
 
 	for _, a := range ac.Alerts {
 		if a.Status == "OK" {
@@ -68,7 +71,7 @@ func (ac *AlertsCollection) ProcessAll() {
 					a.SendAlert()
 					alerts_sent++
 				}
-				a.Backoff = intmin(a.Backoff + 1, len(BACKOFF_DURATIONS))
+				a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
 				a.LastAlerted = time.Now()
 			}
 		}
@@ -76,38 +79,19 @@ func (ac *AlertsCollection) ProcessAll() {
 		a.PreviousStatus = a.Status
 	}
 	if alerts_sent >= GLOBAL_THROTTLE {
-		simpleSendMail(
-			EMAIL_FROM,
-			EMAIL_TO,
-			"[ALERT] Hound is throttled",
-			fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
-				"This probably indicates an infrastructure problem (network, graphite, etc)", failures,
-				GLOBAL_THROTTLE))
+		e.Throttled(failures, GLOBAL_THROTTLE)
 	}
 
 	if recoveries_sent >= GLOBAL_THROTTLE {
-		simpleSendMail(
-			EMAIL_FROM,
-			EMAIL_TO,
-			"[ALERT] Hound is recovered",
-			fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
-				recoveries_sent,
-				GLOBAL_THROTTLE))
+		e.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE)
 	}
 	if errors > 0 {
 		d := backoff_time(GLOBAL_BACKOFF)
 		window := LAST_ERROR_EMAIL.Add(d)
 		if time.Now().After(window) {
-			simpleSendMail(
-				EMAIL_FROM,
-				EMAIL_TO,
-				"[ERROR] Hound encountered errors",
-				fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+
-					"means that Graphite has fallen behind. It doesn't necessarily mean "+
-					"that there are problems with the services, but it means that Hound "+
-					"is temporarily blind wrt these metrics.", errors))
+			e.EncounteredErrors(errors)
 			LAST_ERROR_EMAIL = time.Now()
-			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF + 1, len(BACKOFF_DURATIONS))
+			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
 		}
 	} else {
 		GLOBAL_BACKOFF = 0

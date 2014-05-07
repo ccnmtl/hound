@@ -217,7 +217,7 @@ var BACKOFF_DURATIONS = []time.Duration{
 	time.Duration(4) * time.Hour,
 	time.Duration(8) * time.Hour,
 	time.Duration(24) * time.Hour,
-} 
+}
 
 func backoff_time(level int) time.Duration {
 	return BACKOFF_DURATIONS[level]

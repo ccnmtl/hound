@@ -52,7 +52,7 @@ func main() {
 	LAST_ERROR_EMAIL = time.Now()
 
 	// initialize all the alerts
-	ac := NewAlertsCollection()
+	ac := NewAlertsCollection(SMTPEmailer{})
 	for _, a := range f.Alerts {
 		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction))
 	}

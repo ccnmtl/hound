@@ -11,11 +11,16 @@ func Test_intmin(t *testing.T) {
 	if intmin(2, 1) != 1 {
 		t.Error("wrong")
 	}
-
 }
 
+type DummyEmailer struct{}
+
+func (d DummyEmailer) Throttled(failures, global_throttle int)                {}
+func (d DummyEmailer) RecoveryThrottled(recoveries_sent, global_throttle int) {}
+func (d DummyEmailer) EncounteredErrors(errors int)                           {}
+
 func Test_emptyAlertsCollection(t *testing.T) {
-	ac := NewAlertsCollection()
+	ac := NewAlertsCollection(DummyEmailer{})
 	ac.ProcessAll()
 	ac.DisplayAll()
 	ac.MakePageResponse()

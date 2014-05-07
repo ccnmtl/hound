@@ -8,7 +8,8 @@ import (
 )
 
 type PageResponse struct {
-	Alerts []*Alert
+	GraphiteBase string
+	Alerts       []*Alert
 }
 
 type AlertsCollection struct {
@@ -144,7 +145,7 @@ func (ac *AlertsCollection) DisplayAll() {
 }
 
 func (ac *AlertsCollection) MakePageResponse() PageResponse {
-	pr := PageResponse{}
+	pr := PageResponse{GraphiteBase: GRAPHITE_BASE}
 	for _, a := range ac.Alerts {
 		pr.Alerts = append(pr.Alerts, a)
 	}

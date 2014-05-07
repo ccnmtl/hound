@@ -6,7 +6,7 @@
 "EmailTo": "anders@columbia.edu",
 "CheckInterval": 5,
 "GlobalThrottle": 10,
-"HttpPort": "9999",
+"HttpPort": "9998",
 "TemplateFile": "index.html",
 "Alerts": [
   {

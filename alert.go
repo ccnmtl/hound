@@ -188,6 +188,39 @@ func (a *Alert) StateOK(recoveries_sent int) int {
 	return 0
 }
 
+func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
+	successes := 0
+	errors := 0
+	failures := 0
+	alerts_sent := 0
+
+	if a.Status == "OK" {
+		successes++
+		recoveries_sent = recoveries_sent + a.StateOK(recoveries_sent)
+	} else {
+		// this one is broken. if we're not in a backoff period
+		// we need to send a message
+		if a.Status == "Error" {
+			errors++
+		} else {
+			failures++
+		}
+		if a.Throttled() {
+			// wait for the throttling to expire
+		} else {
+			if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
+				a.SendAlert()
+				alerts_sent++
+			}
+			a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
+			a.LastAlerted = time.Now()
+		}
+	}
+	// cycle the previous status
+	a.PreviousStatus = a.Status
+	return successes, recoveries_sent, errors, failures, alerts_sent
+}
+
 func extractLastValue(raw_response string) (float64, error) {
 	// just take the most recent value
 	parts := strings.Split(strings.Trim(raw_response, "\n\t "), ",")

@@ -67,6 +67,27 @@ func Test_RecoveryEmailBody(t *testing.T) {
 	}
 }
 
+func Test_UpdateState(t *testing.T) {
+	a := NewAlert("foo", "foo", 10, "above")
+	s, rs, e, f, as := a.UpdateState(0)
+	if s != 1 {
+		t.Error("s is wrong")
+	}
+	if rs != 0 {
+		t.Error("rs is wrong")
+	}
+	if e != 0 {
+		t.Error("e is wrong")
+	}
+	if f != 0 {
+		t.Error("f is wrong")
+	}
+	if as != 0 {
+		t.Error("as is wrong")
+	}
+
+}
+
 func Test_extractLastValue(t *testing.T) {
 	v, err := extractLastValue("1,2")
 	if err != nil {

@@ -42,31 +42,15 @@ func (ac *AlertsCollection) ProcessAll() {
 	successes := 0
 
 	for _, a := range ac.Alerts {
-		if a.Status == "OK" {
-			successes++
-			recoveries_sent = recoveries_sent + a.StateOK(recoveries_sent)
-		} else {
-			// this one is broken. if we're not in a backoff period
-			// we need to send a message
-			if a.Status == "Error" {
-				errors++
-				errored_alerts = append(errored_alerts, a)
-			} else {
-				failures++
-			}
-			if a.Throttled() {
-				// wait for the throttling to expire
-			} else {
-				if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
-					a.SendAlert()
-					alerts_sent++
-				}
-				a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
-				a.LastAlerted = time.Now()
-			}
+		s, rs, e, f, as := a.UpdateState(recoveries_sent)
+		successes = successes + s
+		recoveries_sent = recoveries_sent + rs
+		errors = errors + e
+		failures = failures + f
+		alerts_sent = alerts_sent + as
+		if e > 0 {
+			errored_alerts = append(errored_alerts, a)
 		}
-		// cycle the previous status
-		a.PreviousStatus = a.Status
 	}
 	if alerts_sent >= GLOBAL_THROTTLE {
 		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE)

@@ -209,15 +209,16 @@ func encodeRFC2047(String string) string {
 	return strings.Trim(addr.String(), " <>")
 }
 
+var BACKOFF_DURATIONS = []time.Duration{
+	time.Duration(5) * time.Minute,
+	time.Duration(30) * time.Minute,
+	time.Duration(1) * time.Hour,
+	time.Duration(2) * time.Hour,
+	time.Duration(4) * time.Hour,
+	time.Duration(8) * time.Hour,
+	time.Duration(24) * time.Hour,
+} 
+
 func backoff_time(level int) time.Duration {
-	backoff_durations := []time.Duration{
-		time.Duration(5) * time.Minute,
-		time.Duration(30) * time.Minute,
-		time.Duration(1) * time.Hour,
-		time.Duration(2) * time.Hour,
-		time.Duration(4) * time.Hour,
-		time.Duration(8) * time.Hour,
-		time.Duration(24) * time.Hour,
-	}
-	return backoff_durations[level]
+	return BACKOFF_DURATIONS[level]
 }

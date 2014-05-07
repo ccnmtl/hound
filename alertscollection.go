@@ -68,7 +68,7 @@ func (ac *AlertsCollection) ProcessAll() {
 					a.SendAlert()
 					alerts_sent++
 				}
-				a.Backoff = intmin(a.Backoff + 1, 6)
+				a.Backoff = intmin(a.Backoff + 1, len(BACKOFF_DURATIONS))
 				a.LastAlerted = time.Now()
 			}
 		}
@@ -107,7 +107,7 @@ func (ac *AlertsCollection) ProcessAll() {
 					"that there are problems with the services, but it means that Hound "+
 					"is temporarily blind wrt these metrics.", errors))
 			LAST_ERROR_EMAIL = time.Now()
-			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF + 1, 6)
+			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF + 1, len(BACKOFF_DURATIONS))
 		}
 	} else {
 		GLOBAL_BACKOFF = 0

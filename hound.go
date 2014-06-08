@@ -21,6 +21,7 @@ var (
 	GLOBAL_THROTTLE  int
 	GLOBAL_BACKOFF   int
 	LAST_ERROR_EMAIL time.Time
+	EMAIL_ON_ERROR   bool
 )
 
 func main() {
@@ -49,6 +50,7 @@ func main() {
 	CHECK_INTERVAL = f.CheckInterval
 	GLOBAL_THROTTLE = f.GlobalThrottle
 	GLOBAL_BACKOFF = 0
+	EMAIL_ON_ERROR = f.EmailOnError
 	LAST_ERROR_EMAIL = time.Now()
 
 	// initialize all the alerts

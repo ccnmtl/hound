@@ -17,5 +17,6 @@ type ConfigData struct {
 	GlobalThrottle int
 	HttpPort       string
 	TemplateFile   string
+	EmailOnError   bool
 	Alerts         []AlertData
 }

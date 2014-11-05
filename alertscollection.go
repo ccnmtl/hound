@@ -49,11 +49,11 @@ func (ac *AlertsCollection) ProcessAll() {
 		alerts_sent = alerts_sent + as
 	}
 	if alerts_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE)
+		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE, EMAIL_TO)
 	}
 
 	if recoveries_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE)
+		ac.Emailer.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE, EMAIL_TO)
 	}
 	ac.HandleErrors(errors)
 	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
@@ -64,7 +64,7 @@ func (ac *AlertsCollection) HandleErrors(errors int) {
 		d := backoff_time(GLOBAL_BACKOFF)
 		window := LAST_ERROR_EMAIL.Add(d)
 		if time.Now().After(window) {
-			ac.Emailer.EncounteredErrors(errors)
+			ac.Emailer.EncounteredErrors(errors, EMAIL_TO)
 			LAST_ERROR_EMAIL = time.Now()
 			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
 		}

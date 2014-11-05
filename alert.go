@@ -24,6 +24,7 @@ type Alert struct {
 	Message        string
 	PreviousStatus string
 	Fetcher        Fetcher
+	EmailTo        string
 }
 
 var WINDOW = "10mins"
@@ -37,8 +38,8 @@ var WEEKLY_BGCOLOR = "EEEEEE"
 var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, threshold float64,
-	direction string, fetcher Fetcher) *Alert {
-	return &Alert{name, metric, threshold, direction, 0, time.Now(), "OK", "", "OK", fetcher}
+	direction string, fetcher Fetcher, email_to string) *Alert {
+	return &Alert{name, metric, threshold, direction, 0, time.Now(), "OK", "", "OK", fetcher, email_to}
 }
 
 func (a Alert) Url() string {
@@ -71,7 +72,7 @@ type Fetcher interface {
 	Get(string) (*http.Response, error)
 }
 
-type HTTPFetcher struct {}
+type HTTPFetcher struct{}
 
 func (h HTTPFetcher) Get(url string) (*http.Response, error) {
 	return http.Get(url)
@@ -142,7 +143,7 @@ func (a Alert) String() string {
 func (a *Alert) SendRecoveryMessage() {
 	fmt.Printf("Sending Recovery Message for %s\n", a.Name)
 	simpleSendMail(EMAIL_FROM,
-		EMAIL_TO,
+		a.EmailTo,
 		a.RecoveryEmailSubject(),
 		a.RecoveryEmailBody())
 }
@@ -172,7 +173,7 @@ func (a *Alert) Throttled() bool {
 func (a *Alert) SendAlert() {
 	fmt.Printf("Sending Alert for %s\n", a.Name)
 	simpleSendMail(EMAIL_FROM,
-		EMAIL_TO,
+		a.EmailTo,
 		a.AlertEmailSubject(),
 		a.AlertEmailBody())
 }

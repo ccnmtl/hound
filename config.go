@@ -5,6 +5,7 @@ type AlertData struct {
 	Metric    string
 	Threshold float64
 	Direction string
+	EmailTo   string
 }
 
 type ConfigData struct {

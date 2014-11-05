@@ -21,7 +21,8 @@
   "Name": "Capsim Smoketests Failed",
 	"Metric": "ccnmtl.app.smoketest.capsim.failed",
 	"Threshold": 0.5,
-	"Direction": "above"
+	"Direction": "above",
+  "EmailTo": "anders2@columbia.edu"
   },
   {
   "Name": "Capsim Smoketests Passed",

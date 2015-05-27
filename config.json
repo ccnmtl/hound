@@ -1,14 +1,4 @@
 {
-"GraphiteBase": "http://nanny.cul.columbia.edu/render/",
-"CarbonBase": "nanny.cul.columbia.edu:2003",
-"MetricBase": "ccnmtl.app.gauges.hounddev.",
-"EmailFrom": "hound@ccnmtl.columbia.edu",
-"EmailTo": "anders@columbia.edu",
-"CheckInterval": 5,
-"GlobalThrottle": 10,
-"HttpPort": "9998",
-"TemplateFile": "index.html",
-"EmailOnError": false,
 "Alerts": [
   {
   "Name": "Otto Load Avg",

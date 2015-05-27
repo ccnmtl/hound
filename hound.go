@@ -8,7 +8,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
 var (
@@ -23,6 +26,19 @@ var (
 	LAST_ERROR_EMAIL time.Time
 	EMAIL_ON_ERROR   bool
 )
+
+type config struct {
+	GraphiteBase   string `envconfig:"GRAPHITE_BASE"`
+	CarbonBase     string `envconfig:"CARBON_BASE"`
+	MetricBase     string `envconfig:"METRIC_BASE"`
+	EmailFrom      string `envconfig:"EMAIL_FROM"`
+	EmailTo        string `envconfig:"EMAIL_TO"`
+	CheckInterval  int    `envconfig:"CHECK_INTERVAL"`
+	GlobalThrottle int    `envconfig:"GLOBAL_THROTTLE"`
+	HTTPPort       string `envconfig:"HTTP_PORT"`
+	TemplateFile   string `envconfig:"TEMPLATE_FILE"`
+	EmailOnError   bool   `envconfig:"EMAIL_ON_ERROR"`
+}
 
 func main() {
 	// read the config file
@@ -41,16 +57,28 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var c config
+	err = envconfig.Process("hound", &c)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Println("running on", c.HTTPPort)
+	log.Println(os.Getenv("HOUND_HTTP_PORT"))
+
+	log.Println(c.GraphiteBase)
+	log.Println(os.Getenv("HOUND_GRAPHITE_BASE"))
 	// set global values
-	GRAPHITE_BASE = f.GraphiteBase
-	CARBON_BASE = f.CarbonBase
-	METRIC_BASE = f.MetricBase
-	EMAIL_FROM = f.EmailFrom
-	EMAIL_TO = f.EmailTo
-	CHECK_INTERVAL = f.CheckInterval
-	GLOBAL_THROTTLE = f.GlobalThrottle
+	GRAPHITE_BASE = c.GraphiteBase
+	CARBON_BASE = c.CarbonBase
+	METRIC_BASE = c.MetricBase
+	EMAIL_FROM = c.EmailFrom
+	EMAIL_TO = c.EmailTo
+	CHECK_INTERVAL = c.CheckInterval
+	GLOBAL_THROTTLE = c.GlobalThrottle
 	GLOBAL_BACKOFF = 0
-	EMAIL_ON_ERROR = f.EmailOnError
+	EMAIL_ON_ERROR = c.EmailOnError
+
 	LAST_ERROR_EMAIL = time.Now()
 
 	// initialize all the alerts
@@ -58,7 +86,7 @@ func main() {
 	for _, a := range f.Alerts {
 		email_to := a.EmailTo
 		if email_to == "" {
-			email_to = f.EmailTo
+			email_to = c.EmailTo
 		}
 		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction, HTTPFetcher{}, email_to))
 	}
@@ -70,11 +98,12 @@ func main() {
 		func(w http.ResponseWriter, r *http.Request) {
 			pr := ac.MakePageResponse()
 
-			t, err := template.ParseFiles(f.TemplateFile)
+			t, err := template.ParseFiles(c.TemplateFile)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("%v", err))
 			}
 			t.Execute(w, pr)
 		})
-	log.Fatal(http.ListenAndServe(":"+f.HttpPort, nil))
+
+	log.Fatal(http.ListenAndServe(":"+c.HTTPPort, nil))
 }

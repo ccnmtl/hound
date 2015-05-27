@@ -9,15 +9,5 @@ type AlertData struct {
 }
 
 type ConfigData struct {
-	GraphiteBase   string
-	CarbonBase     string
-	MetricBase     string
-	EmailFrom      string
-	EmailTo        string
-	CheckInterval  int
-	GlobalThrottle int
-	HttpPort       string
-	TemplateFile   string
-	EmailOnError   bool
-	Alerts         []AlertData
+	Alerts []AlertData
 }

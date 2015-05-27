@@ -7,7 +7,7 @@ fmt:
 	go fmt *.go
 
 run: hound
-	./hound -config=./config.json
+	./run.sh
 
 test:
 	go test .

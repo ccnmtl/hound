@@ -15,3 +15,9 @@ test:
 coverage:
 	go test . -coverprofile=coverage.out
 	go tool cover -html=coverage.out -o coverage.html
+
+build: test
+	docker build -t ccnmtl/hound .
+
+push: build
+	docker push ccnmtl/hound

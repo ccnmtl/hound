@@ -36,8 +36,8 @@ a.Error { background-color: #f60;}
 {{ end }}
 <br style="clear: both" />
 </div>
-<img width="800" height="150" src="{{.GraphiteBase}}?width=800&height=150&_salt=1399312175.381&target=keepLastValue(ccnmtl.app.gauges.hound.errors)&target=keepLastValue(ccnmtl.app.gauges.hound.successes)&target=keepLastValue(ccnmtl.app.gauges.hound.failures)&from=-24hours&areaMode=stacked&bgcolor=ffffff&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
-<img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&_salt=1399312175.381&target=keepLastValue(ccnmtl.app.gauges.hound.errors)&target=keepLastValue(ccnmtl.app.gauges.hound.successes)&target=keepLastValue(ccnmtl.app.gauges.hound.failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
+<img width="800" height="150" src="{{.GraphiteBase}}?width=800&height=150&_salt=1399312175.381&target=keepLastValue({{MetricBase}}errors)&target=keepLastValue({{MetricBase}}successes)&target=keepLastValue({{MetricBase}}failures)&from=-24hours&areaMode=stacked&bgcolor=ffffff&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
+<img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&_salt=1399312175.381&target=keepLastValue({{MetricBase}}errors)&target=keepLastValue({{MetricBase}}successes)&target=keepLastValue({{MetricBase}}failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
 </td>
 </tr>
 

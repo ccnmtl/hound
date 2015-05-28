@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -64,10 +63,6 @@ func main() {
 	}
 
 	log.Println("running on", c.HTTPPort)
-	log.Println(os.Getenv("HOUND_HTTP_PORT"))
-
-	log.Println(c.GraphiteBase)
-	log.Println(os.Getenv("HOUND_GRAPHITE_BASE"))
 	// set global values
 	GRAPHITE_BASE = c.GraphiteBase
 	CARBON_BASE = c.CarbonBase

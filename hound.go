@@ -24,6 +24,8 @@ var (
 	GLOBAL_BACKOFF   int
 	LAST_ERROR_EMAIL time.Time
 	EMAIL_ON_ERROR   bool
+	SMTP_SERVER      string
+	SMTP_PORT        int
 )
 
 type config struct {
@@ -37,6 +39,8 @@ type config struct {
 	HTTPPort       string `envconfig:"HTTP_PORT"`
 	TemplateFile   string `envconfig:"TEMPLATE_FILE"`
 	EmailOnError   bool   `envconfig:"EMAIL_ON_ERROR"`
+	SMTPServer     string `envconfig:"SMTP_SERVER"`
+	SMTPPort       int    `envconfig:"SMTP_PORT"`
 }
 
 func main() {
@@ -73,6 +77,8 @@ func main() {
 	GLOBAL_THROTTLE = c.GlobalThrottle
 	GLOBAL_BACKOFF = 0
 	EMAIL_ON_ERROR = c.EmailOnError
+	SMTP_SERVER = c.SMTPServer
+	SMTP_PORT = c.SMTPPort
 
 	LAST_ERROR_EMAIL = time.Now()
 

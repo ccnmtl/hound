@@ -10,5 +10,7 @@ export HOUND_GLOBAL_THROTTLE=10
 export HOUND_HTTP_PORT=9998
 export HOUND_TEMPLATE_FILE="index.html"
 export HOUND_EMAIL_ON_ERROR=false
+export HOUND_SMTP_SERVER=postgres
+export HOUND_SMTP_PORT=25
 
 ./hound -config=config.json

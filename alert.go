@@ -258,7 +258,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
 	auth := smtp.PlainAuth("", "", "", "")
-	return SendMail("127.0.0.1:25", auth, from, []string{to}, []byte(message))
+	return SendMail(SMTP_SERVER+":"+string(SMTP_PORT), auth, from, []string{to}, []byte(message))
 }
 
 func encodeRFC2047(String string) string {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/mail"
 	"net/smtp"
@@ -258,7 +259,16 @@ func simpleSendMail(from, to, subject string, body string) error {
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
 	auth := smtp.PlainAuth("", "", "", "")
-	return SendMail(SMTP_SERVER+":"+string(SMTP_PORT), auth, from, []string{to}, []byte(message))
+	err := SendMail(SMTP_SERVER+":"+string(SMTP_PORT), auth, from, []string{to}, []byte(message))
+	if err != nil {
+		log.Println("error sending mail")
+		log.Println(err)
+		log.Println("SMTP_SERVER:", SMTP_SERVER)
+		log.Println("SMTP_PORT:", SMTP_PORT)
+		log.Println("to:", to)
+		log.Println("from:", from)
+	}
+	return err
 }
 
 func encodeRFC2047(String string) string {

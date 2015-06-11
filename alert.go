@@ -259,14 +259,12 @@ func simpleSendMail(from, to, subject string, body string) error {
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
 	auth := smtp.PlainAuth("", "", "", "")
-	err := SendMail(SMTP_SERVER+":"+string(SMTP_PORT), auth, from, []string{to}, []byte(message))
+	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
+	err := SendMail(s, auth, from, []string{to}, []byte(message))
 	if err != nil {
 		log.Println("error sending mail")
 		log.Println(err)
-		log.Println("SMTP_SERVER:", SMTP_SERVER)
-		log.Println("SMTP_PORT:", SMTP_PORT)
-		log.Println("to:", to)
-		log.Println("from:", from)
+		log.Println(s)
 	}
 	return err
 }

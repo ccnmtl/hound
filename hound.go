@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -29,18 +31,19 @@ var (
 )
 
 type config struct {
-	GraphiteBase   string `envconfig:"GRAPHITE_BASE"`
-	CarbonBase     string `envconfig:"CARBON_BASE"`
-	MetricBase     string `envconfig:"METRIC_BASE"`
-	EmailFrom      string `envconfig:"EMAIL_FROM"`
-	EmailTo        string `envconfig:"EMAIL_TO"`
-	CheckInterval  int    `envconfig:"CHECK_INTERVAL"`
-	GlobalThrottle int    `envconfig:"GLOBAL_THROTTLE"`
-	HTTPPort       string `envconfig:"HTTP_PORT"`
-	TemplateFile   string `envconfig:"TEMPLATE_FILE"`
-	EmailOnError   bool   `envconfig:"EMAIL_ON_ERROR"`
-	SMTPServer     string `envconfig:"SMTP_SERVER"`
-	SMTPPort       int    `envconfig:"SMTP_PORT"`
+	GraphiteBase      string `envconfig:"GRAPHITE_BASE"`
+	CarbonBase        string `envconfig:"CARBON_BASE"`
+	MetricBase        string `envconfig:"METRIC_BASE"`
+	EmailFrom         string `envconfig:"EMAIL_FROM"`
+	EmailTo           string `envconfig:"EMAIL_TO"`
+	CheckInterval     int    `envconfig:"CHECK_INTERVAL"`
+	GlobalThrottle    int    `envconfig:"GLOBAL_THROTTLE"`
+	HTTPPort          string `envconfig:"HTTP_PORT"`
+	TemplateFile      string `envconfig:"TEMPLATE_FILE"`
+	AlertTemplateFile string `envconfig:"ALERT_TEMPLATE_FILE"`
+	EmailOnError      bool   `envconfig:"EMAIL_ON_ERROR"`
+	SMTPServer        string `envconfig:"SMTP_SERVER"`
+	SMTPPort          int    `envconfig:"SMTP_PORT"`
 }
 
 func main() {
@@ -97,11 +100,29 @@ func main() {
 
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
-			pr := ac.MakePageResponse()
+			pr := ac.MakePageResponse(0)
 
 			t, err := template.ParseFiles(c.TemplateFile)
 			if err != nil {
-				fmt.Println(fmt.Sprintf("%v", err))
+				log.Println(fmt.Sprintf("%v", err))
+			}
+			t.Execute(w, pr)
+		})
+
+	http.HandleFunc("/alert/",
+		func(w http.ResponseWriter, r *http.Request) {
+			stringIdx := strings.Split(r.URL.String(), "/")[2]
+			idx, _ := strconv.Atoi(stringIdx)
+			pr := ac.MakePageResponse(idx)
+
+			if c.AlertTemplateFile == "" {
+				// default to same location as index.html
+				c.AlertTemplateFile = strings.Replace(c.TemplateFile, "index", "alert", 1)
+			}
+
+			t, err := template.ParseFiles(c.AlertTemplateFile)
+			if err != nil {
+				log.Println(fmt.Sprintf("%v", err))
 			}
 			t.Execute(w, pr)
 		})

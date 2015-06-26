@@ -1,0 +1,49 @@
+<html>
+<head><title>Hound</title>
+<link rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+<style type="text/css">
+tr.OK th { background-color: #ccffcc; }
+tr.Failed th { background-color: #ffcccc; }
+tr.Error th { background-color: #ffddcc; }
+th { vertical-align: top; white-space:nowrap;}
+a.box {
+   display: block;
+   float: left;
+   width: 10px;
+   height: 10px;
+   margin: 1px;
+   border: 1px solid black;
+}
+
+a.OK { background-color: #0f0;}
+a.Failed { background-color: #f00;}
+a.Error { background-color: #f60;}
+
+</style>
+</head>
+<body>
+
+{{ with $element := index .Alerts .Idx }}
+
+<h1><a href="/">Hound</a>: {{$element.Name}}</h1>
+<table class="table">
+
+<tr class="{{$element.BootstrapStatus}}">
+<th>{{$element.Name}}<br />
+{{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}
+</th>
+<td>
+<h2>Daily Graph</h2>
+<img src="{{$element.DailyGraphUrl}}" width="800" height="150" />
+
+<h2>Weekly Graph</h2>
+<img src="{{$element.WeeklyGraphUrl}}" width="800" height="75" />
+</td></tr>
+</table>
+
+{{ end }}
+
+
+</body>
+</html>

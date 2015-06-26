@@ -26,6 +26,7 @@ type Alert struct {
 	PreviousStatus string
 	Fetcher        Fetcher
 	EmailTo        string
+	Value          float64
 }
 
 var WINDOW = "10mins"
@@ -40,7 +41,12 @@ var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, threshold float64,
 	direction string, fetcher Fetcher, email_to string) *Alert {
-	return &Alert{name, metric, threshold, direction, 0, time.Now(), "OK", "", "OK", fetcher, email_to}
+	return &Alert{Name: name,
+		Metric: metric, Threshold: threshold, Direction: direction,
+		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
+		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
+		Value: 0.0,
+	}
 }
 
 func (a Alert) Url() string {
@@ -112,6 +118,7 @@ func (a *Alert) CheckMetric() bool {
 }
 
 func (a *Alert) UpdateStatus(lv float64) {
+	a.Value = lv
 	if a.Direction == "above" {
 		// pass if metric is below the threshold
 		if lv < a.Threshold {
@@ -139,6 +146,32 @@ func (a Alert) String() string {
 	} else {
 		return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 	}
+}
+
+func (a Alert) RenderDirection() string {
+	if a.Status == "OK" {
+		if a.Direction == "above" {
+			return "<"
+		} else {
+			return ">"
+		}
+	} else {
+		if a.Direction == "above" {
+			return ">"
+		} else {
+			return "<"
+		}
+	}
+}
+
+func (a Alert) BootstrapStatus() string {
+	if a.Status == "OK" {
+		return "OK"
+	}
+	if a.Status == "Failed" {
+		return "danger"
+	}
+	return "warning"
 }
 
 func (a *Alert) SendRecoveryMessage() {

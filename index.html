@@ -1,10 +1,12 @@
 <html>
 <head><title>Hound</title>
+<link rel="stylesheet"
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
 <style type="text/css">
 tr.OK th { background-color: #ccffcc; }
 tr.Failed th { background-color: #ffcccc; }
 tr.Error th { background-color: #ffddcc; }
-th { vertical-align: top; }
+th { vertical-align: top; white-space:nowrap;}
 a.box {
    display: block;
    float: left;
@@ -24,12 +26,11 @@ a.Error { background-color: #f60;}
 
 <h1>Hound</h1>
 
-<table>
+<table class="table table-condensed table-striped">
 
 <tr>
 	<th>Summary</th>
-
-	<td>
+	<td colspan="3">
 <div style="width: 800px">
 {{ range $index, $element := .Alerts }}
 <a class="box {{$element.Status}}" href="#alert-{{$index}}"></a>
@@ -41,14 +42,25 @@ a.Error { background-color: #f60;}
 </td>
 </tr>
 
+<tr>
+<th>Metric</th>
+<th></th>
+<th>Current Value/Threshold</th>
+<th>Graphite Metric</th>
+</tr>
 
 {{ range $index, $element := .Alerts }}
-<tr class="{{ $element.Status }}">
-	<th><a id="alert-{{$index}}">{{ $element.Name }}</a></th>
+<tr class="{{ $element.BootstrapStatus }}">
+	<th><a id="alert-{{$index}}"></a>{{ $element.Name }}</th>
 	<td>
-<img src="{{$element.DailyGraphUrl}}" width="800" height="150" />
-<img src="{{$element.WeeklyGraphUrl}}" width="800" height="75" />
-</td>
+		<a href="/alert/{{$index}}/"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span></a>
+	</td>
+	<td>
+  {{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}
+	</td>
+	<td>
+  {{$element.Metric}}
+	</td>
 </tr>
 {{ end }}
 

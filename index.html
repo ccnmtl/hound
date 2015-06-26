@@ -44,7 +44,7 @@ a.Error { background-color: #f60;}
 
 {{ range $index, $element := .Alerts }}
 <tr class="{{ $element.Status }}">
-	<th><a name="alert-{{$index}}">{{ $element.Name }}</a></th>
+	<th><a id="alert-{{$index}}">{{ $element.Name }}</a></th>
 	<td>
 <img src="{{$element.DailyGraphUrl}}" width="800" height="150" />
 <img src="{{$element.WeeklyGraphUrl}}" width="800" height="75" />

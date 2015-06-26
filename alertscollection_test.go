@@ -23,5 +23,5 @@ func Test_emptyAlertsCollection(t *testing.T) {
 	ac := NewAlertsCollection(DummyEmailer{})
 	ac.ProcessAll()
 	ac.DisplayAll()
-	ac.MakePageResponse()
+	ac.MakePageResponse(0)
 }

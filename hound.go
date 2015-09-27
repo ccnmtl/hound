@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"expvar"
 	"flag"
 	"fmt"
 	"html/template"
@@ -28,6 +29,14 @@ var (
 	EMAIL_ON_ERROR   bool
 	SMTP_SERVER      string
 	SMTP_PORT        int
+)
+
+var (
+	EXP_FAILED          = expvar.NewInt("failed")
+	EXP_PASSED          = expvar.NewInt("passed")
+	EXP_ERRORS          = expvar.NewInt("errors")
+	EXP_GLOBAL_THROTTLE = expvar.NewInt("throttle")
+	EXP_GLOBAL_BACKOFF  = expvar.NewInt("backoff")
 )
 
 type config struct {

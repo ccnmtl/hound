@@ -12,5 +12,6 @@ export HOUND_TEMPLATE_FILE="index.html"
 export HOUND_EMAIL_ON_ERROR=false
 export HOUND_SMTP_SERVER=postgres
 export HOUND_SMTP_PORT=25
+export HOUND_LOG_LEVEL=DEBUG
 
 ./hound -config=config.json

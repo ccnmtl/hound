@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type PageResponse struct {
@@ -120,7 +122,7 @@ func (ac *AlertsCollection) Run() {
 
 func (ac *AlertsCollection) DisplayAll() {
 	for _, a := range ac.Alerts {
-		fmt.Println(a)
+		log.Debug(a)
 	}
 }
 

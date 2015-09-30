@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -53,9 +53,11 @@ type config struct {
 	EmailOnError      bool   `envconfig:"EMAIL_ON_ERROR"`
 	SMTPServer        string `envconfig:"SMTP_SERVER"`
 	SMTPPort          int    `envconfig:"SMTP_PORT"`
+	LogLevel          string `envconfig:"LOG_LEVEL"`
 }
 
 func main() {
+	log.SetLevel(log.InfoLevel)
 	// read the config file
 	var configfile string
 	flag.StringVar(&configfile, "config", "./config.json", "JSON config file")
@@ -78,7 +80,21 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	log.Println("running on", c.HTTPPort)
+	// defaults to INFO
+	if c.LogLevel == "DEBUG" {
+		log.SetLevel(log.DebugLevel)
+	}
+	if c.LogLevel == "WARN" {
+		log.SetLevel(log.WarnLevel)
+	}
+	if c.LogLevel == "ERROR" {
+		log.SetLevel(log.ErrorLevel)
+	}
+	if c.LogLevel == "FATAL" {
+		log.SetLevel(log.FatalLevel)
+	}
+
+	log.Info("running on ", c.HTTPPort)
 	// set global values
 	GRAPHITE_BASE = c.GraphiteBase
 	CARBON_BASE = c.CarbonBase
@@ -113,7 +129,9 @@ func main() {
 
 			t, err := template.ParseFiles(c.TemplateFile)
 			if err != nil {
-				log.Println(fmt.Sprintf("%v", err))
+				log.WithFields(log.Fields{
+					"error": fmt.Sprintf("%v", err),
+				}).Fatal("Error parsing template")
 			}
 			t.Execute(w, pr)
 		})
@@ -131,7 +149,7 @@ func main() {
 
 			t, err := template.ParseFiles(c.AlertTemplateFile)
 			if err != nil {
-				log.Println(fmt.Sprintf("%v", err))
+				log.Fatal(fmt.Sprintf("%v", err))
 			}
 			t.Execute(w, pr)
 		})

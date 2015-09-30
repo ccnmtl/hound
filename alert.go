@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/mail"
 	"net/smtp"
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Alert struct {
@@ -295,9 +296,12 @@ func simpleSendMail(from, to, subject string, body string) error {
 	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
 	err := SendMail(s, auth, from, []string{to}, []byte(message))
 	if err != nil {
-		log.Println("error sending mail")
-		log.Println(err)
-		log.Println(s)
+		log.WithFields(
+			log.Fields{
+				"error":       err,
+				"mail server": s,
+			},
+		).Error("error sending mail")
 	}
 	return err
 }

@@ -218,8 +218,9 @@ func (a *Alert) AlertEmailSubject() string {
 }
 
 func (a *Alert) AlertEmailBody() string {
-	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>\n",
-		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl())
+	return fmt.Sprintf("%s [%s] has triggered an alert<br />\nStatus:\t%s\n<br />Message:\t%s<br />\n<br />\nDaily Graph: <img src='%s' width='%d' height='%d' /><br />\nWeekly Graph: <img src='%s' width='%d' height='%d' /><br />\n",
+		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), GRAPH_WIDTH, DAILY_GRAPH_HEIGHT, a.WeeklyGraphUrl(),
+		GRAPH_WIDTH, WEEKLY_GRAPH_HEIGHT)
 }
 
 func (a *Alert) StateOK(recoveries_sent int) int {
@@ -283,7 +284,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	header["To"] = to
 	header["Subject"] = subject
 	header["MIME-Version"] = "1.0"
-	header["Content-Type"] = "text/plain; charset=\"utf-8\""
+	header["Content-Type"] = "text/html; charset=\"utf-8\""
 	header["Content-Transfer-Encoding"] = "base64"
 
 	message := ""

@@ -4,7 +4,8 @@
   "Name": "Otto Load Avg",
         "Metric": "summarize(ccnmtl.server.selma.cpu.load_average.1_minute,'7min','avg')",
         "Threshold": 1.0,
-        "Direction": "above"
+      "Direction": "above",
+      "RunBookLink": "https://github.com/ccnmtl/hound/"
   },
 
   {

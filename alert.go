@@ -28,6 +28,7 @@ type Alert struct {
 	Fetcher        Fetcher
 	EmailTo        string
 	Value          float64
+	RunBookLink    string
 }
 
 var WINDOW = "10mins"
@@ -41,12 +42,12 @@ var WEEKLY_BGCOLOR = "EEEEEE"
 var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, threshold float64,
-	direction string, fetcher Fetcher, email_to string) *Alert {
+	direction string, fetcher Fetcher, email_to string, runbook_link string) *Alert {
 	return &Alert{Name: name,
 		Metric: metric, Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
 		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
-		Value: 0.0,
+		Value: 0.0, RunBookLink: runbook_link,
 	}
 }
 
@@ -217,9 +218,16 @@ func (a *Alert) AlertEmailSubject() string {
 	return fmt.Sprintf("[ALERT] %s", a.Name)
 }
 
+func (a *Alert) IncludeRunBookLink() string {
+	if a.RunBookLink == "" {
+		return ""
+	}
+	return fmt.Sprintf("\n\nRunbook link:\n%s\n", a.RunBookLink)
+}
+
 func (a *Alert) AlertEmailBody() string {
-	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>\n",
-		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl())
+	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>%s\n",
+		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl(), a.IncludeRunBookLink())
 }
 
 func (a *Alert) StateOK(recoveries_sent int) int {

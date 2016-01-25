@@ -40,7 +40,16 @@ a.Error { background-color: #f60;}
 <h2>Weekly Graph</h2>
 <img src="{{$element.WeeklyGraphUrl}}" width="800" height="75" />
 </td></tr>
+
+{{ if $element.RunBookLink }}
+<tr>
+    <td><h2>Runbook link:</h2></td>
+    <td><a href="{{ $element.RunBookLink }}">{{ $element.RunBookLink }}</a></td>
+</tr>
+{{ end }}
+
 </table>
+
 
 {{ end }}
 

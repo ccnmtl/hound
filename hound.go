@@ -29,6 +29,8 @@ var (
 	EMAIL_ON_ERROR   bool
 	SMTP_SERVER      string
 	SMTP_PORT        int
+	SMTP_USER        string
+	SMTP_PASSWORD    string
 )
 
 var (
@@ -53,6 +55,8 @@ type config struct {
 	EmailOnError      bool   `envconfig:"EMAIL_ON_ERROR"`
 	SMTPServer        string `envconfig:"SMTP_SERVER"`
 	SMTPPort          int    `envconfig:"SMTP_PORT"`
+	SMTPUser          string `envconfig:"SMTP_USER"`
+	SMTPPassword      string `envconfig:"SMTP_PASSWORD"`
 	LogLevel          string `envconfig:"LOG_LEVEL"`
 }
 

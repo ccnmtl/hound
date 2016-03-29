@@ -300,7 +300,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
-	auth := smtp.PlainAuth("", "", "", "")
+	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, "")
 	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
 	err := SendMail(s, auth, from, []string{to}, []byte(message))
 	if err != nil {

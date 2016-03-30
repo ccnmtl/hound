@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -262,6 +263,11 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 		}
 		if a.Throttled() {
 			// wait for the throttling to expire
+			log.WithFields(
+				log.Fields{
+					"recoveries_sent": recoveries_sent,
+				},
+			).Debug("throttled")
 		} else {
 			if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
 				a.SendAlert()
@@ -286,6 +292,13 @@ func extractLastValue(raw_response string) (float64, error) {
 }
 
 func simpleSendMail(from, to, subject string, body string) error {
+	log.WithFields(
+		log.Fields{
+			"From":    from,
+			"To":      to,
+			"Subject": subject,
+		},
+	).Debug("simpleSendMail")
 	header := make(map[string]string)
 	header["From"] = from
 	header["To"] = to
@@ -299,19 +312,84 @@ func simpleSendMail(from, to, subject string, body string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
-
-	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, "")
 	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
-	err := SendMail(s, auth, from, []string{to}, []byte(message))
-	if err != nil {
-		log.WithFields(
-			log.Fields{
-				"error":       err,
-				"mail server": s,
-			},
-		).Error("error sending mail")
+	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, SMTP_SERVER)
+
+	if SMTP_PORT == 25 {
+		err := SendMail(s, auth, from, []string{to}, []byte(message))
+		if err != nil {
+			log.WithFields(
+				log.Fields{
+					"error":       err,
+					"mail server": s,
+				},
+			).Error("error sending mail")
+		}
+		return err
+	} else {
+		tlsconfig := &tls.Config{
+			InsecureSkipVerify: true,
+			ServerName:         SMTP_SERVER,
+		}
+
+		conn, err := tls.Dial("tcp", s, tlsconfig)
+		if err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("tls.Dial failed")
+			return err
+		}
+
+		c, err := smtp.NewClient(conn, SMTP_SERVER)
+		if err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
+			return err
+		}
+
+		// Auth
+		if err = c.Auth(auth); err != nil {
+			log.WithFields(
+				log.Fields{
+					"err":           err,
+					"SMTP_USER":     SMTP_USER,
+					"SMTP_PASSWORD": SMTP_PASSWORD,
+					"SMTP_SERVER":   SMTP_SERVER,
+				}).Error("auth failed")
+			return err
+		}
+
+		// To && From
+		if err = c.Mail(from); err != nil {
+			log.WithFields(log.Fields{"err": err, "from": from}).Error("from address failed")
+			return err
+		}
+
+		if err = c.Rcpt(to); err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("to address failed")
+			return err
+		}
+
+		// Data
+		w, err := c.Data()
+		if err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("smtp Data() failed")
+			return err
+		}
+
+		_, err = w.Write([]byte(message))
+		if err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("smtp Write failed")
+			return err
+		}
+
+		err = w.Close()
+		if err != nil {
+			log.WithFields(log.Fields{"err": err}).Error("smtp close failed")
+			return err
+		}
+
+		c.Quit()
+		return err
 	}
-	return err
+
 }
 
 func encodeRFC2047(String string) string {

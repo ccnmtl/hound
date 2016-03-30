@@ -111,6 +111,8 @@ func main() {
 	EMAIL_ON_ERROR = c.EmailOnError
 	SMTP_SERVER = c.SMTPServer
 	SMTP_PORT = c.SMTPPort
+	SMTP_USER = c.SMTPUser
+	SMTP_PASSWORD = c.SMTPPassword
 
 	LAST_ERROR_EMAIL = time.Now()
 

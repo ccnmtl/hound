@@ -1,14 +1,6 @@
 {
 "Alerts": [
   {
-  "Name": "Otto Load Avg",
-        "Metric": "summarize(ccnmtl.server.selma.cpu.load_average.1_minute,'7min','avg')",
-        "Threshold": 1.0,
-      "Direction": "above",
-      "RunBookLink": "https://github.com/ccnmtl/hound/"
-  },
-
-  {
   "Name": "Capsim Smoketests Failed",
 	"Metric": "ccnmtl.app.smoketest.capsim.failed",
 	"Threshold": 0.5,
@@ -18,7 +10,7 @@
   {
   "Name": "Capsim Smoketests Passed",
 	"Metric": "ccnmtl.app.smoketest.capsim.passed",
-	"Threshold": 0.5,
+	"Threshold": 5.5,
 	"Direction": "below" 
 	},
   {

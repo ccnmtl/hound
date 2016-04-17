@@ -23,6 +23,13 @@ func Test_String(t *testing.T) {
 	}
 }
 
+func Test_StringWhiteSpaceRemoval(t *testing.T) {
+	a := NewAlert("foo", " foo\n\n \t \r", 10, "above", DummyFetcher{}, "test@example.com", "")
+	if a.Metric != "foo" {
+		t.Error("whitespace not removed from metric")
+	}
+}
+
 func Test_Url(t *testing.T) {
 	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
 	if a.Url() != "?target=keepLastValue(foo)&format=raw&from=-10mins" {

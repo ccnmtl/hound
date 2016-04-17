@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/mail"
 	"net/smtp"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -45,11 +46,16 @@ var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 func NewAlert(name string, metric string, threshold float64,
 	direction string, fetcher Fetcher, email_to string, runbook_link string) *Alert {
 	return &Alert{Name: name,
-		Metric: metric, Threshold: threshold, Direction: direction,
+		Metric: cleanMetric(metric), Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
 		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
 		Value: 0.0, RunBookLink: runbook_link,
 	}
+}
+
+func cleanMetric(metric string) string {
+	re := regexp.MustCompile("[ \n\t\r]+")
+	return re.ReplaceAllString(metric, "")
 }
 
 func (a Alert) Url() string {

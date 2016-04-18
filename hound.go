@@ -39,6 +39,7 @@ var (
 	EXP_ERRORS          = expvar.NewInt("errors")
 	EXP_GLOBAL_THROTTLE = expvar.NewInt("throttle")
 	EXP_GLOBAL_BACKOFF  = expvar.NewInt("backoff")
+	EXP_UPTIME          = expvar.NewInt("uptime")
 )
 
 type config struct {
@@ -115,6 +116,14 @@ func main() {
 	SMTP_PASSWORD = c.SMTPPassword
 
 	LAST_ERROR_EMAIL = time.Now()
+
+	go func() {
+		// update uptime
+		for {
+			time.Sleep(1 * time.Second)
+			EXP_UPTIME.Add(1)
+		}
+	}()
 
 	// initialize all the alerts
 	ac := NewAlertsCollection(SMTPEmailer{})

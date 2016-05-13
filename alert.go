@@ -208,6 +208,9 @@ func invertDirection(d string) string {
 }
 
 func (a *Alert) Throttled() bool {
+	if a.Backoff == 0 {
+		return false
+	}
 	d := backoff_time(a.Backoff)
 	window := a.LastAlerted.Add(d)
 	return time.Now().Before(window)

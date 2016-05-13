@@ -25,3 +25,17 @@ func Test_emptyAlertsCollection(t *testing.T) {
 	ac.DisplayAll()
 	ac.MakePageResponse(0)
 }
+
+func Test_HandleErrors(t *testing.T) {
+	ac := NewAlertsCollection(DummyEmailer{})
+	ac.HandleErrors(1)
+}
+
+func Test_AddAlert(t *testing.T) {
+	ac := NewAlertsCollection(DummyEmailer{})
+	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	ac.AddAlert(a)
+
+	ac.DisplayAll()
+	ac.MakePageResponse(0)
+}

@@ -20,6 +20,7 @@ import (
 type Alert struct {
 	Name           string
 	Metric         string
+	Type           string
 	Threshold      float64
 	Direction      string
 	Backoff        int
@@ -43,9 +44,12 @@ var DAILY_COLORLIST = "%23999999,%23006699"
 var WEEKLY_BGCOLOR = "EEEEEE"
 var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
-func NewAlert(name string, metric string, threshold float64,
+func NewAlert(name string, metric string, atype string, threshold float64,
 	direction string, fetcher Fetcher, email_to string, runbook_link string) *Alert {
-	return &Alert{Name: name,
+	if atype == "" {
+		atype = "Alert"
+	}
+	return &Alert{Name: name, Type: atype,
 		Metric: cleanMetric(metric), Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
 		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
@@ -183,6 +187,14 @@ func (a Alert) BootstrapStatus() string {
 	return "warning"
 }
 
+func (a Alert) GlyphIcon() string {
+	if a.Type == "Notice" {
+		return "glyphicon-info-sign"
+	} else {
+		return "glyphicon-warning-sign"
+	}
+}
+
 func (a *Alert) SendRecoveryMessage() {
 	fmt.Printf("Sending Recovery Message for %s\n", a.Name)
 	simpleSendMail(EMAIL_FROM,
@@ -225,7 +237,11 @@ func (a *Alert) SendAlert() {
 }
 
 func (a *Alert) AlertEmailSubject() string {
-	return fmt.Sprintf("[ALERT] %s", a.Name)
+	if a.Type == "Alert" {
+		return fmt.Sprintf("[ALERT] %s", a.Name)
+	} else {
+		return fmt.Sprintf("[NOTICE] %s", a.Name)
+	}
 }
 
 func (a *Alert) IncludeRunBookLink() string {

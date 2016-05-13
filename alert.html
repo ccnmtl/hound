@@ -26,11 +26,11 @@ a.Error { background-color: #f60;}
 
 {{ with $element := index .Alerts .Idx }}
 
-<h1><a href="/">Hound</a>: {{$element.Name}}</h1>
-<table class="table">
+    <h1><a href="/">Hound</a>: <span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{$element.Name}}</h1>
+    <table class="table">
 
-<tr class="{{$element.BootstrapStatus}}">
-<th>{{$element.Name}}<br />
+        <tr class="{{$element.BootstrapStatus}}">
+            <th><span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{$element.Name}}<br />
 {{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}
 </th>
 <td>

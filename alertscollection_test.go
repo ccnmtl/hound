@@ -33,7 +33,7 @@ func Test_HandleErrors(t *testing.T) {
 
 func Test_AddAlert(t *testing.T) {
 	ac := NewAlertsCollection(DummyEmailer{})
-	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
 	ac.AddAlert(a)
 
 	ac.DisplayAll()

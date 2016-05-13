@@ -132,7 +132,7 @@ func main() {
 		if email_to == "" {
 			email_to = c.EmailTo
 		}
-		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Threshold, a.Direction, HTTPFetcher{}, email_to, a.RunBookLink))
+		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, HTTPFetcher{}, email_to, a.RunBookLink))
 	}
 
 	// kick it off in the background

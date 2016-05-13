@@ -22,6 +22,12 @@ email when the metric has recovered.
 Each Alert has:
 
 * `Name`: obvious.
+* `Type`: defaults to 'Alert'. You can also set it to 'Notice'. The
+  convention is that an alert means "something is broken and a human
+  needs to fix it NOW" while a Notice is just "you should know about
+  this" and it's either not directly actionable or not urgent. Eg,
+  high CPU load is probably a Notice, while high request error rates
+  would warrant an alert.
 * `Metric`: the actual Graphite metric being checked. This can be as
   complicated as you like and use the full suite of Graphite
   functions.

@@ -101,6 +101,41 @@ func Test_UpdateState(t *testing.T) {
 	if as != 0 {
 		t.Error("as is wrong")
 	}
+	a.Status = "Failed"
+	s, rs, e, f, as = a.UpdateState(0)
+	if s != 0 {
+		t.Error("s is wrong")
+	}
+	if rs != 0 {
+		t.Error("rs is wrong")
+	}
+	if e != 0 {
+		t.Error("e is wrong")
+	}
+	if f != 1 {
+		t.Error("f is wrong")
+	}
+	if as != 0 {
+		t.Error("as is wrong")
+	}
+
+	a.Status = "Error"
+	s, rs, e, f, as = a.UpdateState(0)
+	if s != 0 {
+		t.Error("s is wrong")
+	}
+	if rs != 0 {
+		t.Error("rs is wrong")
+	}
+	if e != 1 {
+		t.Error("e is wrong")
+	}
+	if f != 0 {
+		t.Error("f is wrong")
+	}
+	if as != 0 {
+		t.Error("as is wrong")
+	}
 
 }
 
@@ -139,5 +174,52 @@ func Test_UpdateStatus(t *testing.T) {
 	a.UpdateStatus(9.0)
 	if a.Status != "Failed" {
 		t.Error("should've failed")
+	}
+}
+
+func Test_RenderDirection(t *testing.T) {
+	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	if a.RenderDirection() != "<" {
+		t.Error("(OK, above) expected <, got >")
+	}
+
+	a = NewAlert("foo", "foo", 10, "below", DummyFetcher{}, "test@example.com", "")
+	if a.RenderDirection() != ">" {
+		t.Error("(OK, below) expected <, got >")
+	}
+
+	a = NewAlert("foo", "foo", 10, "below", DummyFetcher{}, "test@example.com", "")
+	a.Status = "Failed"
+	if a.RenderDirection() != "<" {
+		t.Error("(Failed, below) expected >, got <")
+	}
+
+	a = NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	a.Status = "Failed"
+	if a.RenderDirection() != ">" {
+		t.Error("(Failed, above) expected <, got >")
+	}
+}
+
+func Test_BootstrapStatus(t *testing.T) {
+	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	if a.BootstrapStatus() != "OK" {
+		t.Error("bootstrap status OK expected OK")
+	}
+	a.Status = "Failed"
+	if a.BootstrapStatus() != "danger" {
+		t.Error("bootstrap status Failed expected danger")
+	}
+	a.Status = "other"
+	if a.BootstrapStatus() != "warning" {
+		t.Error("bootstrap status other expected warning")
+	}
+}
+
+func Test_StateOK(t *testing.T) {
+	a := NewAlert("foo", "foo", 10, "above", DummyFetcher{}, "test@example.com", "")
+	a.PreviousStatus = "Failed"
+	if a.StateOK(GLOBAL_THROTTLE-1) != 1 {
+		t.Error("StateOK expected 1")
 	}
 }

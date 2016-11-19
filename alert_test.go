@@ -238,3 +238,12 @@ func Test_StateOK(t *testing.T) {
 		t.Error("StateOK expected 1")
 	}
 }
+
+func Test_Hash(t *testing.T) {
+	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
+	expected := "22138d2e6b"
+	result := a.Hash()
+	if result != expected {
+		t.Error("incorrect Hash", expected, result)
+	}
+}

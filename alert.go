@@ -1,10 +1,12 @@
 package main
 
 import (
+	"crypto/sha1"
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/mail"
@@ -305,6 +307,15 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 	// cycle the previous status
 	a.PreviousStatus = a.Status
 	return successes, recoveries_sent, errors, failures, alerts_sent
+}
+
+func (a Alert) Hash() string {
+	h := sha1.New()
+	io.WriteString(h, fmt.Sprintf("metric: %s", a.Metric))
+	io.WriteString(h, fmt.Sprintf("direction: %s", a.Direction))
+	io.WriteString(h, fmt.Sprintf("threshold: %f", a.Threshold))
+	io.WriteString(h, fmt.Sprintf("type: %s", a.Type))
+	return fmt.Sprintf("%x", h.Sum(nil))[0:10]
 }
 
 func extractLastValue(raw_response string) (float64, error) {

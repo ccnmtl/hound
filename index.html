@@ -33,7 +33,7 @@ a.Error { background-color: #f60;}
 	<td colspan="3">
 <div style="width: 800px">
 {{ range $index, $element := .Alerts }}
-<a class="box {{$element.Status}}" href="#alert-{{$index}}"></a>
+<a class="box {{$element.Status}}" href="#alert-{{$element.Hash}}"></a>
 {{ end }}
 <br style="clear: both" />
 </div>
@@ -51,9 +51,9 @@ a.Error { background-color: #f60;}
 
 {{ range $index, $element := .Alerts }}
 <tr class="{{ $element.BootstrapStatus }}">
-	<th><a id="alert-{{$index}}"></a><span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{ $element.Name }}</th>
+	<th><a id="alert-{{$element.Hash}}"></a><span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{ $element.Name }}</th>
 	<td>
-		<a href="/alert/{{$index}}/"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span></a>
+		  <a href="/alert/{{$element.Hash}}/"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span></a>
 	</td>
 	<td>
   {{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}

@@ -38,4 +38,9 @@ func Test_AddAlert(t *testing.T) {
 
 	ac.DisplayAll()
 	ac.MakePageResponse(0)
+
+	retrieved := ac.ByHash(a.Hash())
+	if retrieved != a {
+		t.Error("failed to retrieve alert")
+	}
 }

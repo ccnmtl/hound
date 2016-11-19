@@ -24,7 +24,7 @@ a.Error { background-color: #f60;}
 </head>
 <body>
 
-{{ with $element := index .Alerts .Idx }}
+{{ with $element := .Alert }}
 
     <h1><a href="/">Hound</a>: <span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{$element.Name}}</h1>
     <table class="table">

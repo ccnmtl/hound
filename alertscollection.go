@@ -16,17 +16,29 @@ type PageResponse struct {
 	Idx          int
 }
 
+type IndivPageResponse struct {
+	GraphiteBase string
+	MetricBase   string
+	Alert        *Alert
+}
+
 type AlertsCollection struct {
-	Alerts  []*Alert
-	Emailer Emailer
+	Alerts       []*Alert
+	AlertsByHash map[string]*Alert
+	Emailer      Emailer
 }
 
 func NewAlertsCollection(e Emailer) *AlertsCollection {
-	return &AlertsCollection{Emailer: e}
+	return &AlertsCollection{Emailer: e, AlertsByHash: make(map[string]*Alert)}
 }
 
 func (ac *AlertsCollection) AddAlert(a *Alert) {
 	ac.Alerts = append(ac.Alerts, a)
+	ac.AlertsByHash[a.Hash()] = a
+}
+
+func (ac *AlertsCollection) ByHash(s string) *Alert {
+	return ac.AlertsByHash[s]
 }
 
 func (ac *AlertsCollection) CheckAll() {
@@ -133,4 +145,10 @@ func (ac *AlertsCollection) MakePageResponse(idx int) PageResponse {
 		pr.Alerts = append(pr.Alerts, a)
 	}
 	return pr
+}
+
+func (ac *AlertsCollection) MakeIndivPageResponse(idx string) IndivPageResponse {
+	return IndivPageResponse{GraphiteBase: GRAPHITE_BASE,
+		MetricBase: METRIC_BASE,
+		Alert:      ac.ByHash(idx)}
 }

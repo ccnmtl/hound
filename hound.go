@@ -8,7 +8,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -154,8 +153,7 @@ func main() {
 	http.HandleFunc("/alert/",
 		func(w http.ResponseWriter, r *http.Request) {
 			stringIdx := strings.Split(r.URL.String(), "/")[2]
-			idx, _ := strconv.Atoi(stringIdx)
-			pr := ac.MakePageResponse(idx)
+			pr := ac.MakeIndivPageResponse(stringIdx)
 
 			if c.AlertTemplateFile == "" {
 				// default to same location as index.html

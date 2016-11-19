@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/ccnmtl/hound.svg?branch=master)](https://travis-ci.org/ccnmtl/hound)
+[![Coverage Status](https://coveralls.io/repos/github/ccnmtl/hound/badge.svg?branch=master)](https://coveralls.io/github/ccnmtl/hound?branch=master)
 
 ## Hound
 

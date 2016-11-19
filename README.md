@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ccnmtl/hound.svg?branch=master)](https://travis-ci.org/ccnmtl/hound)
+
 ## Hound
 
 This is a simple service that watches a number of Graphite metrics and

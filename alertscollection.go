@@ -13,7 +13,6 @@ type PageResponse struct {
 	GraphiteBase string
 	MetricBase   string
 	Alerts       []*Alert
-	Idx          int
 }
 
 type IndivPageResponse struct {
@@ -138,9 +137,9 @@ func (ac *AlertsCollection) DisplayAll() {
 	}
 }
 
-func (ac *AlertsCollection) MakePageResponse(idx int) PageResponse {
+func (ac *AlertsCollection) MakePageResponse() PageResponse {
 	pr := PageResponse{GraphiteBase: GRAPHITE_BASE,
-		MetricBase: METRIC_BASE, Idx: idx}
+		MetricBase: METRIC_BASE}
 	for _, a := range ac.Alerts {
 		pr.Alerts = append(pr.Alerts, a)
 	}

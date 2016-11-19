@@ -23,7 +23,7 @@ func Test_emptyAlertsCollection(t *testing.T) {
 	ac := NewAlertsCollection(DummyEmailer{})
 	ac.ProcessAll()
 	ac.DisplayAll()
-	ac.MakePageResponse(0)
+	ac.MakePageResponse()
 }
 
 func Test_HandleErrors(t *testing.T) {
@@ -37,7 +37,7 @@ func Test_AddAlert(t *testing.T) {
 	ac.AddAlert(a)
 
 	ac.DisplayAll()
-	ac.MakePageResponse(0)
+	ac.MakePageResponse()
 
 	retrieved := ac.ByHash(a.Hash())
 	if retrieved != a {

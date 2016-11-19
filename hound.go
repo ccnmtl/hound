@@ -139,7 +139,7 @@ func main() {
 
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
-			pr := ac.MakePageResponse(0)
+			pr := ac.MakePageResponse()
 
 			t, err := template.ParseFiles(c.TemplateFile)
 			if err != nil {

@@ -58,6 +58,8 @@ type config struct {
 	SMTPUser          string `envconfig:"SMTP_USER"`
 	SMTPPassword      string `envconfig:"SMTP_PASSWORD"`
 	LogLevel          string `envconfig:"LOG_LEVEL"`
+	ReadTimeout       int    `envconfig:"READ_TIMEOUT"`
+	WriteTimeout      int    `envconfig:"WRITE_TIMEOUT"`
 }
 
 func main() {
@@ -114,6 +116,14 @@ func main() {
 	SMTP_USER = c.SMTPUser
 	SMTP_PASSWORD = c.SMTPPassword
 
+	// some defaults
+	if c.ReadTimeout == 0 {
+		c.ReadTimeout = 5
+	}
+	if c.WriteTimeout == 0 {
+		c.WriteTimeout = 10
+	}
+
 	LAST_ERROR_EMAIL = time.Now()
 
 	go func() {
@@ -166,6 +176,10 @@ func main() {
 			}
 			t.Execute(w, pr)
 		})
-
-	log.Fatal(http.ListenAndServe(":"+c.HTTPPort, nil))
+	s := &http.Server{
+		Addr:           ":" + c.HTTPPort,
+		ReadTimeout:    time.Duration(c.ReadTimeout) * time.Second,
+		WriteTimeout:   time.Duration(c.WriteTimeout) * time.Second,
+	}
+	log.Fatal(s.ListenAndServe())
 }

@@ -259,7 +259,7 @@ func (a *Alert) AlertEmailBody() string {
 }
 
 func (a *Alert) StateOK(recoveries_sent int) int {
-	if a.PreviousStatus == "Failed" {
+	if a.PreviousStatus == "Failed" || a.PreviousStatus == "Error" {
 		// this one has recovered. need to send a message
 		if recoveries_sent < GLOBAL_THROTTLE {
 			a.SendRecoveryMessage()

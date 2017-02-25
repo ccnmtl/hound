@@ -266,8 +266,6 @@ func (a *Alert) StateOK(recoveries_sent int) int {
 		}
 		return 1
 	}
-	// everything is peachy
-	a.Backoff = 0
 	return 0
 }
 
@@ -280,6 +278,7 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 	if a.Status == "OK" {
 		successes++
 		recoveries_sent = recoveries_sent + a.StateOK(recoveries_sent)
+		a.Backoff = 0
 	} else {
 		// this one is broken. if we're not in a backoff period
 		// we need to send a message

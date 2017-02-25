@@ -258,8 +258,9 @@ func (a *Alert) AlertEmailBody() string {
 		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl(), a.IncludeRunBookLink())
 }
 
+// did this alert just return to a healthy state?
 // returns 1 if just recovered, 0 otherwise
-func (a *Alert) StateOK() int {
+func (a *Alert) JustRecovered() int {
 	if a.PreviousStatus == "Failed" || a.PreviousStatus == "Error" {
 		return 1
 	}
@@ -281,7 +282,7 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 	if a.Status == "OK" {
 		successes++
 		a.SendRecoveryMessageIfNeeded(recoveries_sent)
-		recoveries_sent = recoveries_sent + a.StateOK()
+		recoveries_sent = recoveries_sent + a.JustRecovered()
 		a.Backoff = 0
 	} else {
 		// this one is broken. if we're not in a backoff period

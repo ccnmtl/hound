@@ -198,7 +198,11 @@ func (a Alert) GlyphIcon() string {
 }
 
 func (a *Alert) SendRecoveryMessage() {
-	fmt.Printf("Sending Recovery Message for %s\n", a.Name)
+	log.WithFields(
+		log.Fields{
+			"name": a.Name,
+		},
+	).Debug("sending Recovery Message")
 	simpleSendMail(EMAIL_FROM,
 		a.EmailTo,
 		a.RecoveryEmailSubject(),
@@ -231,7 +235,11 @@ func (a *Alert) Throttled() bool {
 }
 
 func (a *Alert) SendAlert() {
-	fmt.Printf("Sending Alert for %s\n", a.Name)
+	log.WithFields(
+		log.Fields{
+			"name": a.Name,
+		},
+	).Debug("Sending Alert")
 	simpleSendMail(EMAIL_FROM,
 		a.EmailTo,
 		a.AlertEmailSubject(),

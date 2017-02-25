@@ -260,15 +260,12 @@ func (a *Alert) AlertEmailBody() string {
 
 // did this alert just return to a healthy state?
 // returns 1 if just recovered, 0 otherwise
-func (a *Alert) JustRecovered() int {
-	if a.PreviousStatus == "Failed" || a.PreviousStatus == "Error" {
-		return 1
-	}
-	return 0
+func (a *Alert) JustRecovered() bool {
+	return a.PreviousStatus == "Failed" || a.PreviousStatus == "Error"
 }
 
 func (a *Alert) SendRecoveryMessageIfNeeded(recoveries_sent int) {
-	if (a.PreviousStatus == "Failed" || a.PreviousStatus == "Error") && recoveries_sent < GLOBAL_THROTTLE {
+	if a.JustRecovered() && recoveries_sent < GLOBAL_THROTTLE {
 		a.SendRecoveryMessage()
 	}
 }
@@ -282,7 +279,9 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 	if a.Status == "OK" {
 		successes++
 		a.SendRecoveryMessageIfNeeded(recoveries_sent)
-		recoveries_sent = recoveries_sent + a.JustRecovered()
+		if a.JustRecovered() {
+			recoveries_sent++
+		}
 		a.Backoff = 0
 	} else {
 		// this one is broken. if we're not in a backoff period

@@ -234,8 +234,16 @@ func Test_BootstrapStatus(t *testing.T) {
 func Test_StateOK(t *testing.T) {
 	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
 	a.PreviousStatus = "Failed"
-	if a.StateOK(GLOBAL_THROTTLE-1) != 1 {
+	if a.StateOK() != 1 {
 		t.Error("StateOK expected 1")
+	}
+	a.PreviousStatus = "Error"
+	if a.StateOK() != 1 {
+		t.Error("StateOK expected 1")
+	}
+	a.PreviousStatus = "OK"
+	if a.StateOK() != 0 {
+		t.Error("StateOK expected 0")
 	}
 }
 

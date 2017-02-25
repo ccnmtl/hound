@@ -258,15 +258,18 @@ func (a *Alert) AlertEmailBody() string {
 		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl(), a.IncludeRunBookLink())
 }
 
-func (a *Alert) StateOK(recoveries_sent int) int {
+// returns 1 if just recovered, 0 otherwise
+func (a *Alert) StateOK() int {
 	if a.PreviousStatus == "Failed" || a.PreviousStatus == "Error" {
-		// this one has recovered. need to send a message
-		if recoveries_sent < GLOBAL_THROTTLE {
-			a.SendRecoveryMessage()
-		}
 		return 1
 	}
 	return 0
+}
+
+func (a *Alert) SendRecoveryMessageIfNeeded(recoveries_sent int) {
+	if (a.PreviousStatus == "Failed" || a.PreviousStatus == "Error") && recoveries_sent < GLOBAL_THROTTLE {
+		a.SendRecoveryMessage()
+	}
 }
 
 func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
@@ -277,7 +280,8 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 
 	if a.Status == "OK" {
 		successes++
-		recoveries_sent = recoveries_sent + a.StateOK(recoveries_sent)
+		a.SendRecoveryMessageIfNeeded(recoveries_sent)
+		recoveries_sent = recoveries_sent + a.StateOK()
 		a.Backoff = 0
 	} else {
 		// this one is broken. if we're not in a backoff period

@@ -1,0 +1,12 @@
+hash: 37edd57c64aa879211794bfdf0ecc818fc7914c67783150089adf48295eff74f
+updated: 2017-03-08T13:16:56.668665692Z
+imports:
+- name: github.com/kelseyhightower/envconfig
+  version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/Sirupsen/logrus
+  version: 0208149b40d863d2c1a2f8fe5753096a9cf2cc8b
+- name: golang.org/x/sys
+  version: d67a3279aecd76a65c4c9e6c352c888f5b3a574a
+  subpackages:
+  - unix
+testImports: []

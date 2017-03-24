@@ -1,5 +1,11 @@
 #!/bin/sh
 
+set -e
+
+make hound
+
+echo "Running hound..."
+
 HOUND_GRAPHITE_BASE="http://nanny.cul.columbia.edu/render/" \
 HOUND_CARBON_BASE="nanny.cul.columbia.edu:2003" \
 HOUND_METRIC_BASE="ccnmtl.app.gauges.hounddev." \

@@ -8,9 +8,6 @@ hound: hound.go smtp.go alert.go alertscollection.go config.go
 fmt:
 	go fmt *.go
 
-run: hound
-	./run.sh
-
 test:
 	go test .
 

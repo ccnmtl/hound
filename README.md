@@ -22,7 +22,7 @@ email when the metric has recovered.
 ### Usage
 
 1. Edit the file `run.sh` with the correct values for your use.
-2. run `./run.sh` (preferrably in a detachable session or with `nohup`)
+2. run `./run.sh`
 
 ### Configuration
 

@@ -12,15 +12,33 @@ minutes after that, one hour after that, 2 hours after that, 4 hours,
 8 hours, then every 24 hours thereafter. Finally, you will get an
 email when the metric has recovered.
 
+### Dependencies
+
+1. Obviously enough, hound need a running graphite server, accessible via
+   network.
+2. In addition, an SMTP host is necessary (without authentication or
+   encryption) to send the emails out.
+
+### Usage
+
+1. Edit the file `run.sh` with the correct values for your use.
+2. run `./run.sh` (preferrably in a detachable session or with `nohup`)
+
 ### Configuration
 
-* `GraphiteBase`, `EmailFrom`, and `EmailTo` should all be obvious
+The main configuration happens (as noted above) in `run.sh`.
+
 * `CheckInterval` is how many minutes to wait between checks
-* `GlobalThrottle` is the maximum number of alerts that Hound will
-  send in a cycle. Ie, if there's a major network outage and all the
-	metrics start failing, you want to stop it once you've figured that
-  out. Once this threshold is passed, Hound sends just one more message
-	saying how many metrics are failing.
+* `GlobalThrottle` is the maximum number of alerts that Hound will send in a
+  cycle. Ie, if there's a major network outage and all the metrics start
+  failing, you want to stop it once you've figured that out. Once this
+  threshold is passed, Hound sends just one more message saying how many
+  metrics are failing.
+
+The rest of the values in this file should be self-explanatory.
+
+The alerts configuration is set in `config.json` (by default - it is passed as
+an argument to `hound` in `run.sh`).
 
 Each Alert has:
 

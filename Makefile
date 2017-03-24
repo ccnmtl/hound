@@ -1,4 +1,4 @@
-ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+ROOT_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all: hound
 
@@ -8,14 +8,15 @@ hound: hound.go smtp.go alert.go alertscollection.go config.go
 fmt:
 	go fmt *.go
 
-run: hound
-	./run.sh
-
 test:
 	go test .
 
-coverage:
+coverage: coverage.html
+
+coverage.out:
 	go test . -coverprofile=coverage.out
+
+coverage.html: coverage.out
 	go tool cover -html=coverage.out -o coverage.html
 
 build:
@@ -23,3 +24,5 @@ build:
 
 push: build
 	docker push ccnmtl/hound
+
+.PHONY: all fmt run test coverage build push

@@ -12,17 +12,26 @@ minutes after that, one hour after that, 2 hours after that, 4 hours,
 8 hours, then every 24 hours thereafter. Finally, you will get an
 email when the metric has recovered.
 
-### Dependencies
+### Docker image
 
-1. Obviously enough, hound need a running graphite server, accessible via
+There is a docker image for running hound and postfix. See
+<https://github.com/ccnmtl/postfix-docker>,
+<https://hub.docker.com/r/hopsoft/graphite-statsd/> and
+<https://github.com/ccnmtl/hound/blob/master/Dockerfile> for more information.
+
+### Without docker
+
+#### Dependencies
+
+1. Obviously enough, hound needs a running graphite server, accessible via
    network.
 2. In addition, an SMTP host is necessary (without authentication or
    encryption) to send the emails out.
 
-### Usage
+#### Usage
 
 1. Edit the file `run.sh` with the correct values for your use.
-2. run `./run.sh` (preferrably in a detachable session or with `nohup`)
+2. run `./run.sh`
 
 ### Configuration
 

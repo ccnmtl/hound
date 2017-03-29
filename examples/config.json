@@ -1,0 +1,30 @@
+{
+    "Alerts": [
+        {
+            "Name": "Capsim Smoketests Failed",
+            "Metric": "ccnmtl.app.smoketest.capsim.failed",
+            "Threshold": 0.5,
+            "Direction": "above",
+            "EmailTo": "anders2@columbia.edu"
+        },
+        {
+            "Name": "Capsim Smoketests Passed",
+            "Metric": "ccnmtl.app.smoketest.capsim.passed",
+            "Threshold": 5.5,
+            "Direction": "below"
+        },
+        {
+            "Name": "Capsim Smoketests Passed Notice",
+            "Type": "Notice",
+            "Metric": "ccnmtl.app.smoketest.capsim.passed",
+            "Threshold": 5.5,
+            "Direction": "below"
+        },
+        {
+            "Name": "MVSim Smoketests Failed",
+            "Metric": "ccnmtl.app.smoketest.mvsim.failed",
+            "Threshold": 0.5,
+            "Direction": "above"
+        }
+    ]
+}

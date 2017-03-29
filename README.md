@@ -28,14 +28,9 @@ There is a docker image for running hound and postfix. See
 2. In addition, an SMTP host is necessary (without authentication or
    encryption) to send the emails out.
 
-#### Usage
-
-1. Edit the file `run.sh` with the correct values for your use.
-2. run `./run.sh`
-
 ### Configuration
 
-The main configuration happens (as noted above) in `run.sh`.
+There are a couple example configs in the `examples/` directory.
 
 * `CheckInterval` is how many minutes to wait between checks
 * `GlobalThrottle` is the maximum number of alerts that Hound will send in a
@@ -47,7 +42,7 @@ The main configuration happens (as noted above) in `run.sh`.
 The rest of the values in this file should be self-explanatory.
 
 The alerts configuration is set in `config.json` (by default - it is passed as
-an argument to `hound` in `run.sh`).
+an argument to `hound` in `run_nohup.sh`).
 
 Each Alert has:
 

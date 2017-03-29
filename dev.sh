@@ -2,7 +2,7 @@
 
 set -e
 
-make hound
+make
 
 echo "Running hound..."
 
@@ -21,4 +21,4 @@ HOUND_SMTP_SERVER=postgres \
 HOUND_SMTP_PORT=25 \
 HOUND_LOG_LEVEL=DEBUG \
 \
->hound.out 2>hound.err </dev/null nohup ./hound -config=config.json &
+./hound -config=config.json

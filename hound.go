@@ -30,6 +30,7 @@ var (
 	SMTP_PORT        int
 	SMTP_USER        string
 	SMTP_PASSWORD    string
+	WINDOW           string
 )
 
 var (
@@ -60,6 +61,7 @@ type config struct {
 	LogLevel          string `envconfig:"LOG_LEVEL"`
 	ReadTimeout       int    `envconfig:"READ_TIMEOUT"`
 	WriteTimeout      int    `envconfig:"WRITE_TIMEOUT"`
+	Window            string `envconfig:"WINDOW"`
 }
 
 func main() {
@@ -115,6 +117,7 @@ func main() {
 	SMTP_PORT = c.SMTPPort
 	SMTP_USER = c.SMTPUser
 	SMTP_PASSWORD = c.SMTPPassword
+	WINDOW = c.Window
 
 	// some defaults
 	if c.ReadTimeout == 0 {
@@ -122,6 +125,9 @@ func main() {
 	}
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
+	}
+	if WINDOW == "" {
+		WINDOW = "10mins"
 	}
 
 	LAST_ERROR_EMAIL = time.Now()
@@ -177,9 +183,9 @@ func main() {
 			t.Execute(w, pr)
 		})
 	s := &http.Server{
-		Addr:           ":" + c.HTTPPort,
-		ReadTimeout:    time.Duration(c.ReadTimeout) * time.Second,
-		WriteTimeout:   time.Duration(c.WriteTimeout) * time.Second,
+		Addr:         ":" + c.HTTPPort,
+		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
 	}
 	log.Fatal(s.ListenAndServe())
 }

@@ -36,7 +36,6 @@ type Alert struct {
 	RunBookLink    string
 }
 
-var WINDOW = "10mins"
 var GRAPH_WIDTH = 800
 var DAILY_GRAPH_HEIGHT = 150
 var WEEKLY_GRAPH_HEIGHT = 75

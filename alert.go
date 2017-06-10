@@ -331,9 +331,6 @@ func (a Alert) Hash() string {
 func extractLastValue(raw_response string) (float64, error) {
 	// just take the most recent value
 	parts := strings.Split(strings.Trim(raw_response, "\n\t "), ",")
-	if len(parts) < 1 {
-		return 0.0, errors.New("couldn't parse response")
-	}
 	return strconv.ParseFloat(parts[len(parts)-1], 64)
 }
 

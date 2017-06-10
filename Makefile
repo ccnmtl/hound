@@ -13,7 +13,7 @@ test:
 
 coverage: coverage.html
 
-coverage.out:
+coverage.out: *.go
 	go test . -coverprofile=coverage.out
 
 coverage.html: coverage.out

@@ -169,6 +169,10 @@ func Test_extractLastValue(t *testing.T) {
 	if v != 0.0 {
 		t.Error("should return 0")
 	}
+	_, err = extractLastValue("")
+	if err == nil {
+		t.Error("expected an error")
+	}
 }
 
 func Test_UpdateStatus(t *testing.T) {

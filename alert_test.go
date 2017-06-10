@@ -255,3 +255,12 @@ func Test_Hash(t *testing.T) {
 		t.Error("incorrect Hash", expected, result)
 	}
 }
+
+func Test_invertDirection(t *testing.T) {
+	if invertDirection("above") != "below" {
+		t.Error("expected 'below'")
+	}
+	if invertDirection("below") != "above" {
+		t.Error("expected 'above'")
+	}
+}

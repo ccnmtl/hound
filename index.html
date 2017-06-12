@@ -24,23 +24,24 @@ a.Error { background-color: #f60;}
 </head>
 <body>
 
+    <div class="container">
+
 <h1>Hound</h1>
 
 <table class="table table-condensed table-striped">
 
-<tr>
-	<th>Summary</th>
-	<td colspan="3">
-<div style="width: 800px">
-{{ range $index, $element := .Alerts }}
-<a class="box {{$element.Status}}" href="#alert-{{$element.Hash}}"></a>
-{{ end }}
-<br style="clear: both" />
-</div>
-<img width="800" height="150" src="{{.GraphiteBase}}?width=800&height=150&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-24hours&areaMode=stacked&bgcolor=ffffff&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/><br />
-<img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
-</td>
-</tr>
+    <tr>
+        <td colspan="4">
+            <div>
+                {{ range $index, $element := .Alerts }}
+                <a class="box {{$element.Status}}" href="#alert-{{$element.Hash}}"></a>
+                {{ end }}
+                <br style="clear: both" />
+            </div>
+            <img width="800" height="150" src="{{.GraphiteBase}}?width=800&height=150&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-24hours&areaMode=stacked&bgcolor=ffffff&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/><br />
+            <img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
+        </td>
+    </tr>
 
 <tr>
 <th>Metric</th>
@@ -58,11 +59,13 @@ a.Error { background-color: #f60;}
 	<td>
   {{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}
 	</td>
-	<td>
+	<td><small>
   {{$element.Metric}}
-	</td>
+	</small></td>
 </tr>
 {{ end }}
+
+</div><!-- end .container -->
 
 </body>
 </html>

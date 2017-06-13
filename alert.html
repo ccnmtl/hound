@@ -24,6 +24,8 @@ a.Error { background-color: #f60;}
 </head>
 <body>
 
+    <div class="container">
+
 {{ with $element := .Alert }}
 
     <h1><a href="/">Hound</a>: <span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{$element.Name}}</h1>
@@ -53,6 +55,6 @@ a.Error { background-color: #f60;}
 
 {{ end }}
 
-
+</div><!-- end .container -->
 </body>
 </html>

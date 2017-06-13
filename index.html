@@ -39,6 +39,7 @@ a.Error { background-color: #f60;}
         <img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>
     </div>
 
+    <div class="table-responsive">
 <table class="table table-condensed table-striped">
 <tr>
 <th>Metric</th>
@@ -61,6 +62,8 @@ a.Error { background-color: #f60;}
 	</small></td>
 </tr>
 {{ end }}
+</table>
+    </div><!-- end .table-responsive -->
 
 </div><!-- end .container -->
 

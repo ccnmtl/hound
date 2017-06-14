@@ -31,9 +31,11 @@ a.Error { background-color: #f60;}
         <div>
             <div>
                 {{ range $index, $element := .Alerts }}
-                <a class="box {{$element.Status}}" href="#alert-{{$element.Hash}}"></a>
+                <a class="box {{$element.Status}}"
+                   href="#alert-{{$element.Hash}}"
+                   title="{{$element.Name}}"></a>
                 {{ end }}
-                <br style="clear: both" />
+                <div class="clearfix"></div>
             </div>
             <img width="800" height="150" src="{{.GraphiteBase}}?width=800&height=150&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-24hours&areaMode=stacked&bgcolor=ffffff&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/><br />
             <img width="800" height="75" src="{{.GraphiteBase}}?width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=false&hideAxes=false&_salt=1399312175.381&target=keepLastValue({{.MetricBase}}errors)&target=keepLastValue({{.MetricBase}}successes)&target=keepLastValue({{.MetricBase}}failures)&from=-7days&areaMode=stacked&bgcolor=eeeeee&fgcolor=333333&colorList=ff6600,44bb44,ff0000"/>

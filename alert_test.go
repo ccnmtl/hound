@@ -30,24 +30,24 @@ func Test_StringWhiteSpaceRemoval(t *testing.T) {
 	}
 }
 
-func Test_Url(t *testing.T) {
+func Test_URL(t *testing.T) {
 	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.Url() != "?target=keepLastValue(foo)&format=raw&from=-"+Window {
-		t.Error(fmt.Sprintf("wrong value: %s", a.Url()))
+	if a.URL() != "?target=keepLastValue(foo)&format=raw&from=-"+Window {
+		t.Error(fmt.Sprintf("wrong value: %s", a.URL()))
 	}
 }
 
-func Test_DailyGraphUrl(t *testing.T) {
+func Test_DailyGraphURL(t *testing.T) {
 	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.DailyGraphUrl() != "?target=foo&target=threshold(10.000000)&width=800&height=150&bgcolor=FFFFFF&fgcolor=000000&hideGrid=true&colorList=%23999999,%23006699&from=-24hours" {
-		t.Error(fmt.Sprintf("wrong value: %s", a.DailyGraphUrl()))
+	if a.DailyGraphURL() != "?target=foo&target=threshold(10.000000)&width=800&height=150&bgcolor=FFFFFF&fgcolor=000000&hideGrid=true&colorList=%23999999,%23006699&from=-24hours" {
+		t.Error(fmt.Sprintf("wrong value: %s", a.DailyGraphURL()))
 	}
 }
 
-func Test_WeeklyGraphUrl(t *testing.T) {
+func Test_WeeklyGraphURL(t *testing.T) {
 	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.WeeklyGraphUrl() != "?target=foo&target=threshold(10.000000)&width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=EEEEEE&fgcolor=000000&hideGrid=true&colorList=%23cccccc,%236699cc&from=-7days" {
-		t.Error(fmt.Sprintf("wrong value: %s", a.WeeklyGraphUrl()))
+	if a.WeeklyGraphURL() != "?target=foo&target=threshold(10.000000)&width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=EEEEEE&fgcolor=000000&hideGrid=true&colorList=%23cccccc,%236699cc&from=-7days" {
+		t.Error(fmt.Sprintf("wrong value: %s", a.WeeklyGraphURL()))
 	}
 }
 

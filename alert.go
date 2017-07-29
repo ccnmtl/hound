@@ -63,11 +63,11 @@ func cleanMetric(metric string) string {
 	return re.ReplaceAllString(metric, "")
 }
 
-func (a Alert) Url() string {
+func (a Alert) URL() string {
 	return GraphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + Window
 }
 
-func (a Alert) DailyGraphUrl() string {
+func (a Alert) DailyGraphURL() string {
 	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
@@ -78,7 +78,7 @@ func (a Alert) DailyGraphUrl() string {
 		dailyColorlist + "&from=-24hours"
 }
 
-func (a Alert) WeeklyGraphUrl() string {
+func (a Alert) WeeklyGraphURL() string {
 	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
@@ -100,7 +100,7 @@ func (h HTTPFetcher) Get(url string) (*http.Response, error) {
 }
 
 func (a *Alert) Fetch() (float64, error) {
-	resp, err := a.Fetcher.Get(a.Url())
+	resp, err := a.Fetcher.Get(a.URL())
 	if err != nil {
 		a.Status = "Error"
 		a.Message = "graphite request failed"
@@ -262,7 +262,7 @@ func (a *Alert) IncludeRunBookLink() string {
 
 func (a *Alert) AlertEmailBody() string {
 	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>%s\n",
-		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl(), a.IncludeRunBookLink())
+		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphURL(), a.WeeklyGraphURL(), a.IncludeRunBookLink())
 }
 
 // did this alert just return to a healthy state?

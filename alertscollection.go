@@ -80,20 +80,20 @@ func ExposeVars(failures, errors, successes int) {
 	EXP_ERRORS.Set(int64(errors))
 	EXP_PASSED.Set(int64(successes))
 	EXP_GLOBAL_THROTTLE.Set(int64(GlobalThrottle))
-	EXP_GLOBAL_BACKOFF.Set(int64(GLOBAL_BACKOFF))
+	EXP_GLOBAL_BACKOFF.Set(int64(GlobalBackoff))
 }
 
 func (ac *AlertsCollection) HandleErrors(errors int) {
 	if errors > 0 {
-		d := backoff_time(GLOBAL_BACKOFF)
+		d := backoff_time(GlobalBackoff)
 		window := LastErrorEmail.Add(d)
 		if time.Now().After(window) {
 			ac.Emailer.EncounteredErrors(errors, EmailTo)
 			LastErrorEmail = time.Now()
-			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
+			GlobalBackoff = intmin(GlobalBackoff+1, len(BACKOFF_DURATIONS))
 		}
 	} else {
-		GLOBAL_BACKOFF = 0
+		GlobalBackoff = 0
 	}
 }
 
@@ -112,7 +112,7 @@ func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int
 	fmt.Fprintf(buffer, "%sfailures %d %d\n", MetricBase, failures, now)
 	fmt.Fprintf(buffer, "%serrors %d %d\n", MetricBase, errors, now)
 	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", MetricBase, successes, now)
-	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", MetricBase, GLOBAL_BACKOFF, now)
+	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", MetricBase, GlobalBackoff, now)
 	clientGraphite.Write(buffer.Bytes())
 }
 

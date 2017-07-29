@@ -23,7 +23,7 @@ var (
 	EmailTo        string
 	CheckInterval  int
 	GlobalThrottle int
-	GLOBAL_BACKOFF int
+	GlobalBackoff  int
 	LastErrorEmail time.Time
 	EmailOnError   bool
 	SMTPServer     string
@@ -111,7 +111,7 @@ func main() {
 	EmailTo = c.EmailTo
 	CheckInterval = c.CheckInterval
 	GlobalThrottle = c.GlobalThrottle
-	GLOBAL_BACKOFF = 0
+	GlobalBackoff = 0
 	EmailOnError = c.EmailOnError
 	SMTPServer = c.SMTPServer
 	SMTPPort = c.SMTPPort

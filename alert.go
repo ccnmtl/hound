@@ -228,7 +228,7 @@ func (a *Alert) Throttled() bool {
 	if a.Backoff == 0 {
 		return false
 	}
-	d := backoff_time(a.Backoff)
+	d := backoffTime(a.Backoff)
 	window := a.LastAlerted.Add(d)
 	return time.Now().Before(window)
 }
@@ -451,6 +451,6 @@ var BACKOFF_DURATIONS = []time.Duration{
 	time.Duration(24) * time.Hour,
 }
 
-func backoff_time(level int) time.Duration {
+func backoffTime(level int) time.Duration {
 	return BACKOFF_DURATIONS[level]
 }

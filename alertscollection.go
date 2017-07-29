@@ -127,7 +127,7 @@ func (ac *AlertsCollection) Run() {
 	for {
 		ac.ProcessAll()
 		ac.DisplayAll()
-		time.Sleep(time.Duration(CHECK_INTERVAL) * time.Minute)
+		time.Sleep(time.Duration(CheckInterval) * time.Minute)
 	}
 }
 

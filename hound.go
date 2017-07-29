@@ -21,7 +21,7 @@ var (
 	MetricBase       string
 	EmailFrom        string
 	EmailTo          string
-	CHECK_INTERVAL   int
+	CheckInterval    int
 	GLOBAL_THROTTLE  int
 	GLOBAL_BACKOFF   int
 	LAST_ERROR_EMAIL time.Time
@@ -109,7 +109,7 @@ func main() {
 	MetricBase = c.MetricBase
 	EmailFrom = c.EmailFrom
 	EmailTo = c.EmailTo
-	CHECK_INTERVAL = c.CheckInterval
+	CheckInterval = c.CheckInterval
 	GLOBAL_THROTTLE = c.GlobalThrottle
 	GLOBAL_BACKOFF = 0
 	EMAIL_ON_ERROR = c.EmailOnError

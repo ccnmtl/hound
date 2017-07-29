@@ -30,7 +30,7 @@ var (
 	SMTPPort       int
 	SMTPUser       string
 	SMTPPassword   string
-	WINDOW         string
+	Window         string
 )
 
 var (
@@ -117,7 +117,7 @@ func main() {
 	SMTPPort = c.SMTPPort
 	SMTPUser = c.SMTPUser
 	SMTPPassword = c.SMTPPassword
-	WINDOW = c.Window
+	Window = c.Window
 
 	// some defaults
 	if c.ReadTimeout == 0 {
@@ -126,8 +126,8 @@ func main() {
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
 	}
-	if WINDOW == "" {
-		WINDOW = "10mins"
+	if Window == "" {
+		Window = "10mins"
 	}
 
 	LastErrorEmail = time.Now()

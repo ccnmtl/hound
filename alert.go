@@ -64,7 +64,7 @@ func cleanMetric(metric string) string {
 }
 
 func (a Alert) Url() string {
-	return GraphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + WINDOW
+	return GraphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + Window
 }
 
 func (a Alert) DailyGraphUrl() string {

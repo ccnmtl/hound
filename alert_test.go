@@ -32,7 +32,7 @@ func Test_StringWhiteSpaceRemoval(t *testing.T) {
 
 func Test_Url(t *testing.T) {
 	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.Url() != "?target=keepLastValue(foo)&format=raw&from=-"+WINDOW {
+	if a.Url() != "?target=keepLastValue(foo)&format=raw&from=-"+Window {
 		t.Error(fmt.Sprintf("wrong value: %s", a.Url()))
 	}
 }

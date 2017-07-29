@@ -27,7 +27,7 @@ var (
 	LastErrorEmail time.Time
 	EmailOnError   bool
 	SMTPServer     string
-	SMTP_PORT      int
+	SMTPPort       int
 	SMTP_USER      string
 	SMTP_PASSWORD  string
 	WINDOW         string
@@ -114,7 +114,7 @@ func main() {
 	GLOBAL_BACKOFF = 0
 	EmailOnError = c.EmailOnError
 	SMTPServer = c.SMTPServer
-	SMTP_PORT = c.SMTPPort
+	SMTPPort = c.SMTPPort
 	SMTP_USER = c.SMTPUser
 	SMTP_PASSWORD = c.SMTPPassword
 	WINDOW = c.Window

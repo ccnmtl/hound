@@ -355,10 +355,10 @@ func simpleSendMail(from, to, subject string, body string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
-	s := fmt.Sprintf("%s:%d", SMTPServer, SMTP_PORT)
+	s := fmt.Sprintf("%s:%d", SMTPServer, SMTPPort)
 	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, SMTPServer)
 
-	if SMTP_PORT == 25 {
+	if SMTPPort == 25 {
 		err := SendMail(s, auth, from, []string{to}, []byte(message))
 		if err != nil {
 			log.WithFields(

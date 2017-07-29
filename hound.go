@@ -18,7 +18,7 @@ import (
 var (
 	GraphiteBase     string
 	CarbonBase       string
-	METRIC_BASE      string
+	MetricBase       string
 	EMAIL_FROM       string
 	EMAIL_TO         string
 	CHECK_INTERVAL   int
@@ -106,7 +106,7 @@ func main() {
 	// set global values
 	GraphiteBase = c.GraphiteBase
 	CarbonBase = c.CarbonBase
-	METRIC_BASE = c.MetricBase
+	MetricBase = c.MetricBase
 	EMAIL_FROM = c.EmailFrom
 	EMAIL_TO = c.EmailTo
 	CHECK_INTERVAL = c.CheckInterval

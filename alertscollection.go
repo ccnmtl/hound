@@ -107,12 +107,12 @@ func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int
 	now := int32(time.Now().Unix())
 	buffer := bytes.NewBufferString("")
 
-	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", METRIC_BASE, alerts_sent, now)
-	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", METRIC_BASE, recoveries_sent, now)
-	fmt.Fprintf(buffer, "%sfailures %d %d\n", METRIC_BASE, failures, now)
-	fmt.Fprintf(buffer, "%serrors %d %d\n", METRIC_BASE, errors, now)
-	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", METRIC_BASE, successes, now)
-	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", METRIC_BASE, GLOBAL_BACKOFF, now)
+	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", MetricBase, alerts_sent, now)
+	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", MetricBase, recoveries_sent, now)
+	fmt.Fprintf(buffer, "%sfailures %d %d\n", MetricBase, failures, now)
+	fmt.Fprintf(buffer, "%serrors %d %d\n", MetricBase, errors, now)
+	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", MetricBase, successes, now)
+	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", MetricBase, GLOBAL_BACKOFF, now)
 	clientGraphite.Write(buffer.Bytes())
 }
 
@@ -139,7 +139,7 @@ func (ac *AlertsCollection) DisplayAll() {
 
 func (ac *AlertsCollection) MakePageResponse() PageResponse {
 	pr := PageResponse{GraphiteBase: GraphiteBase,
-		MetricBase: METRIC_BASE}
+		MetricBase: MetricBase}
 	for _, a := range ac.Alerts {
 		pr.Alerts = append(pr.Alerts, a)
 	}
@@ -148,6 +148,6 @@ func (ac *AlertsCollection) MakePageResponse() PageResponse {
 
 func (ac *AlertsCollection) MakeIndivPageResponse(idx string) IndivPageResponse {
 	return IndivPageResponse{GraphiteBase: GraphiteBase,
-		MetricBase: METRIC_BASE,
+		MetricBase: MetricBase,
 		Alert:      ac.ByHash(idx)}
 }

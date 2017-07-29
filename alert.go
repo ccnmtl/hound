@@ -157,25 +157,22 @@ func (a *Alert) UpdateStatus(lv float64) {
 func (a Alert) String() string {
 	if a.Status == "OK" {
 		return fmt.Sprintf("%s\t%s [%s]", a.Status, a.Name, a.Metric)
-	} else {
-		return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 	}
+	return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 }
 
 func (a Alert) RenderDirection() string {
 	if a.Status == "OK" {
 		if a.Direction == "above" {
 			return "<"
-		} else {
-			return ">"
 		}
-	} else {
-		if a.Direction == "above" {
-			return ">"
-		} else {
-			return "<"
-		}
+		return ">"
 	}
+	if a.Direction == "above" {
+		return ">"
+	}
+	return "<"
+
 }
 
 func (a Alert) BootstrapStatus() string {
@@ -191,9 +188,9 @@ func (a Alert) BootstrapStatus() string {
 func (a Alert) GlyphIcon() string {
 	if a.Type == "Notice" {
 		return "glyphicon-info-sign"
-	} else {
-		return "glyphicon-warning-sign"
 	}
+	return "glyphicon-warning-sign"
+
 }
 
 func (a *Alert) SendRecoveryMessage() {
@@ -219,9 +216,8 @@ func (a *Alert) RecoveryEmailBody() string {
 func invertDirection(d string) string {
 	if d == "above" {
 		return "below"
-	} else {
-		return "above"
 	}
+	return "above"
 }
 
 func (a *Alert) Throttled() bool {
@@ -248,9 +244,8 @@ func (a *Alert) SendAlert() {
 func (a *Alert) AlertEmailSubject() string {
 	if a.Type == "Alert" {
 		return fmt.Sprintf("[ALERT] %s", a.Name)
-	} else {
-		return fmt.Sprintf("[NOTICE] %s", a.Name)
 	}
+	return fmt.Sprintf("[NOTICE] %s", a.Name)
 }
 
 func (a *Alert) IncludeRunBookLink() string {
@@ -369,69 +364,68 @@ func simpleSendMail(from, to, subject string, body string) error {
 			).Error("error sending mail")
 		}
 		return err
-	} else {
-		tlsconfig := &tls.Config{
-			InsecureSkipVerify: true,
-			ServerName:         SMTPServer,
-		}
+	}
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         SMTPServer,
+	}
 
-		conn, err := tls.Dial("tcp", s, tlsconfig)
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("tls.Dial failed")
-			return err
-		}
-
-		c, err := smtp.NewClient(conn, SMTPServer)
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
-			return err
-		}
-
-		// Auth
-		if err = c.Auth(auth); err != nil {
-			log.WithFields(
-				log.Fields{
-					"err":           err,
-					"SMTP_USER":     SMTPUser,
-					"SMTP_PASSWORD": SMTPPassword,
-					"SMTP_SERVER":   SMTPServer,
-				}).Error("auth failed")
-			return err
-		}
-
-		// To && From
-		if err = c.Mail(from); err != nil {
-			log.WithFields(log.Fields{"err": err, "from": from}).Error("from address failed")
-			return err
-		}
-
-		if err = c.Rcpt(to); err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("to address failed")
-			return err
-		}
-
-		// Data
-		w, err := c.Data()
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp Data() failed")
-			return err
-		}
-
-		_, err = w.Write([]byte(message))
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp Write failed")
-			return err
-		}
-
-		err = w.Close()
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp close failed")
-			return err
-		}
-
-		c.Quit()
+	conn, err := tls.Dial("tcp", s, tlsconfig)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("tls.Dial failed")
 		return err
 	}
+
+	c, err := smtp.NewClient(conn, SMTPServer)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
+		return err
+	}
+
+	// Auth
+	if err = c.Auth(auth); err != nil {
+		log.WithFields(
+			log.Fields{
+				"err":           err,
+				"SMTP_USER":     SMTPUser,
+				"SMTP_PASSWORD": SMTPPassword,
+				"SMTP_SERVER":   SMTPServer,
+			}).Error("auth failed")
+		return err
+	}
+
+	// To && From
+	if err = c.Mail(from); err != nil {
+		log.WithFields(log.Fields{"err": err, "from": from}).Error("from address failed")
+		return err
+	}
+
+	if err = c.Rcpt(to); err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("to address failed")
+		return err
+	}
+
+	// Data
+	w, err := c.Data()
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp Data() failed")
+		return err
+	}
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp Write failed")
+		return err
+	}
+
+	err = w.Close()
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp close failed")
+		return err
+	}
+
+	c.Quit()
+	return err
 
 }
 

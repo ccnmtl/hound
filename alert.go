@@ -36,7 +36,7 @@ type Alert struct {
 	RunBookLink    string
 }
 
-var GRAPH_WIDTH = 800
+var graphWidth = 800
 var DAILY_GRAPH_HEIGHT = 150
 var WEEKLY_GRAPH_HEIGHT = 75
 var FGCOLOR = "000000"
@@ -71,7 +71,7 @@ func (a Alert) DailyGraphUrl() string {
 	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +
+		")&width=" + fmt.Sprintf("%d", graphWidth) +
 		"&height=" + fmt.Sprintf("%d", DAILY_GRAPH_HEIGHT) +
 		"&bgcolor=" + DAILY_BGCOLOR +
 		"&fgcolor=" + FGCOLOR + "&hideGrid=true&colorList=" +
@@ -82,7 +82,7 @@ func (a Alert) WeeklyGraphUrl() string {
 	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +
+		")&width=" + fmt.Sprintf("%d", graphWidth) +
 		"&height=" + fmt.Sprintf("%d", WEEKLY_GRAPH_HEIGHT) +
 		"&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=" +
 		WEEKLY_BGCOLOR + "&fgcolor=" + FGCOLOR +

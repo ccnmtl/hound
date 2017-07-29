@@ -16,21 +16,21 @@ import (
 )
 
 var (
-	GraphiteBase     string
-	CarbonBase       string
-	MetricBase       string
-	EmailFrom        string
-	EmailTo          string
-	CheckInterval    int
-	GlobalThrottle   int
-	GLOBAL_BACKOFF   int
-	LAST_ERROR_EMAIL time.Time
-	EMAIL_ON_ERROR   bool
-	SMTP_SERVER      string
-	SMTP_PORT        int
-	SMTP_USER        string
-	SMTP_PASSWORD    string
-	WINDOW           string
+	GraphiteBase   string
+	CarbonBase     string
+	MetricBase     string
+	EmailFrom      string
+	EmailTo        string
+	CheckInterval  int
+	GlobalThrottle int
+	GLOBAL_BACKOFF int
+	LastErrorEmail time.Time
+	EMAIL_ON_ERROR bool
+	SMTP_SERVER    string
+	SMTP_PORT      int
+	SMTP_USER      string
+	SMTP_PASSWORD  string
+	WINDOW         string
 )
 
 var (
@@ -130,7 +130,7 @@ func main() {
 		WINDOW = "10mins"
 	}
 
-	LAST_ERROR_EMAIL = time.Now()
+	LastErrorEmail = time.Now()
 
 	go func() {
 		// update uptime

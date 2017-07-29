@@ -86,10 +86,10 @@ func ExposeVars(failures, errors, successes int) {
 func (ac *AlertsCollection) HandleErrors(errors int) {
 	if errors > 0 {
 		d := backoff_time(GLOBAL_BACKOFF)
-		window := LAST_ERROR_EMAIL.Add(d)
+		window := LastErrorEmail.Add(d)
 		if time.Now().After(window) {
 			ac.Emailer.EncounteredErrors(errors, EmailTo)
-			LAST_ERROR_EMAIL = time.Now()
+			LastErrorEmail = time.Now()
 			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
 		}
 	} else {

@@ -143,11 +143,11 @@ func main() {
 	// initialize all the alerts
 	ac := NewAlertsCollection(SMTPEmailer{})
 	for _, a := range f.Alerts {
-		email_to := a.EmailTo
-		if email_to == "" {
-			email_to = c.EmailTo
+		emailTo := a.EmailTo
+		if emailTo == "" {
+			emailTo = c.EmailTo
 		}
-		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, HTTPFetcher{}, email_to, a.RunBookLink))
+		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, HTTPFetcher{}, emailTo, a.RunBookLink))
 	}
 
 	// kick it off in the background

@@ -46,14 +46,14 @@ var WEEKLY_BGCOLOR = "EEEEEE"
 var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, atype string, threshold float64,
-	direction string, fetcher Fetcher, email_to string, runbook_link string) *Alert {
+	direction string, fetcher Fetcher, emailTo string, runbook_link string) *Alert {
 	if atype == "" {
 		atype = "Alert"
 	}
 	return &Alert{Name: name, Type: atype,
 		Metric: cleanMetric(metric), Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
-		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
+		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: emailTo,
 		Value: 0.0, RunBookLink: runbook_link,
 	}
 }

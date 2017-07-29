@@ -28,7 +28,7 @@ var (
 	EmailOnError   bool
 	SMTPServer     string
 	SMTPPort       int
-	SMTP_USER      string
+	SMTPUser       string
 	SMTP_PASSWORD  string
 	WINDOW         string
 )
@@ -115,7 +115,7 @@ func main() {
 	EmailOnError = c.EmailOnError
 	SMTPServer = c.SMTPServer
 	SMTPPort = c.SMTPPort
-	SMTP_USER = c.SMTPUser
+	SMTPUser = c.SMTPUser
 	SMTP_PASSWORD = c.SMTPPassword
 	WINDOW = c.Window
 

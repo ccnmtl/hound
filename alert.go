@@ -202,7 +202,7 @@ func (a *Alert) SendRecoveryMessage() {
 			"name": a.Name,
 		},
 	).Debug("sending Recovery Message")
-	simpleSendMail(EMAIL_FROM,
+	simpleSendMail(EmailFrom,
 		a.EmailTo,
 		a.RecoveryEmailSubject(),
 		a.RecoveryEmailBody())
@@ -239,7 +239,7 @@ func (a *Alert) SendAlert() {
 			"name": a.Name,
 		},
 	).Debug("Sending Alert")
-	simpleSendMail(EMAIL_FROM,
+	simpleSendMail(EmailFrom,
 		a.EmailTo,
 		a.AlertEmailSubject(),
 		a.AlertEmailBody())

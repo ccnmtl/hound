@@ -19,7 +19,7 @@ var (
 	GraphiteBase     string
 	CarbonBase       string
 	MetricBase       string
-	EMAIL_FROM       string
+	EmailFrom        string
 	EMAIL_TO         string
 	CHECK_INTERVAL   int
 	GLOBAL_THROTTLE  int
@@ -107,7 +107,7 @@ func main() {
 	GraphiteBase = c.GraphiteBase
 	CarbonBase = c.CarbonBase
 	MetricBase = c.MetricBase
-	EMAIL_FROM = c.EmailFrom
+	EmailFrom = c.EmailFrom
 	EMAIL_TO = c.EmailTo
 	CHECK_INTERVAL = c.CheckInterval
 	GLOBAL_THROTTLE = c.GlobalThrottle

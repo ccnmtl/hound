@@ -14,7 +14,7 @@ type SMTPEmailer struct{}
 
 func (e SMTPEmailer) Throttled(failures, global_throttle int, emailTo string) {
 	simpleSendMail(
-		EMAIL_FROM,
+		EmailFrom,
 		emailTo,
 		"[ALERT] Hound is throttled",
 		fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
@@ -27,7 +27,7 @@ func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, ema
 		return
 	}
 	simpleSendMail(
-		EMAIL_FROM,
+		EmailFrom,
 		emailTo,
 		"[ALERT] Hound is recovered",
 		fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
@@ -40,7 +40,7 @@ func (e SMTPEmailer) EncounteredErrors(errors int, emailTo string) {
 		return
 	}
 	simpleSendMail(
-		EMAIL_FROM,
+		EmailFrom,
 		emailTo,
 		"[ERROR] Hound encountered errors",
 		fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+

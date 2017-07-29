@@ -49,7 +49,7 @@ func (ac *AlertsCollection) CheckAll() {
 func (ac *AlertsCollection) ProcessAll() {
 	// fetch/calculate new status for all
 	ac.CheckAll()
-	alerts_sent := 0
+	alertsSent := 0
 	recoveriesSent := 0
 	errors := 0
 	failures := 0
@@ -61,9 +61,9 @@ func (ac *AlertsCollection) ProcessAll() {
 		recoveriesSent = recoveriesSent + rs
 		errors = errors + e
 		failures = failures + f
-		alerts_sent = alerts_sent + as
+		alertsSent = alertsSent + as
 	}
-	if alerts_sent >= GlobalThrottle {
+	if alertsSent >= GlobalThrottle {
 		ac.Emailer.Throttled(failures, GlobalThrottle, EmailTo)
 	}
 
@@ -71,7 +71,7 @@ func (ac *AlertsCollection) ProcessAll() {
 		ac.Emailer.RecoveryThrottled(recoveriesSent, GlobalThrottle, EmailTo)
 	}
 	ac.HandleErrors(errors)
-	LogToGraphite(alerts_sent, recoveriesSent, failures, errors, successes)
+	LogToGraphite(alertsSent, recoveriesSent, failures, errors, successes)
 	ExposeVars(failures, errors, successes)
 }
 
@@ -97,7 +97,7 @@ func (ac *AlertsCollection) HandleErrors(errors int) {
 	}
 }
 
-func LogToGraphite(alerts_sent, recoveriesSent, failures, errors, successes int) {
+func LogToGraphite(alertsSent, recoveriesSent, failures, errors, successes int) {
 	var clientGraphite net.Conn
 	clientGraphite, err := net.Dial("tcp", CarbonBase)
 	if err != nil || clientGraphite == nil {
@@ -107,7 +107,7 @@ func LogToGraphite(alerts_sent, recoveriesSent, failures, errors, successes int)
 	now := int32(time.Now().Unix())
 	buffer := bytes.NewBufferString("")
 
-	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", MetricBase, alerts_sent, now)
+	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", MetricBase, alertsSent, now)
 	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", MetricBase, recoveriesSent, now)
 	fmt.Fprintf(buffer, "%sfailures %d %d\n", MetricBase, failures, now)
 	fmt.Fprintf(buffer, "%serrors %d %d\n", MetricBase, errors, now)

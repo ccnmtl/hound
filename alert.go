@@ -281,7 +281,7 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	successes := 0
 	errors := 0
 	failures := 0
-	alerts_sent := 0
+	alertsSent := 0
 
 	if a.Status == "OK" {
 		successes++
@@ -306,9 +306,9 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 				},
 			).Debug("throttled")
 		} else {
-			if a.Status == "Failed" && alerts_sent < GlobalThrottle {
+			if a.Status == "Failed" && alertsSent < GlobalThrottle {
 				a.SendAlert()
-				alerts_sent++
+				alertsSent++
 			}
 			a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
 			a.LastAlerted = time.Now()
@@ -316,7 +316,7 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	}
 	// cycle the previous status
 	a.PreviousStatus = a.Status
-	return successes, recoveriesSent, errors, failures, alerts_sent
+	return successes, recoveriesSent, errors, failures, alertsSent
 }
 
 func (a Alert) Hash() string {

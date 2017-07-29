@@ -29,7 +29,7 @@ var (
 	SMTPServer     string
 	SMTPPort       int
 	SMTPUser       string
-	SMTP_PASSWORD  string
+	SMTPPassword   string
 	WINDOW         string
 )
 
@@ -116,7 +116,7 @@ func main() {
 	SMTPServer = c.SMTPServer
 	SMTPPort = c.SMTPPort
 	SMTPUser = c.SMTPUser
-	SMTP_PASSWORD = c.SMTPPassword
+	SMTPPassword = c.SMTPPassword
 	WINDOW = c.Window
 
 	// some defaults

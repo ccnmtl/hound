@@ -328,9 +328,9 @@ func (a Alert) Hash() string {
 	return fmt.Sprintf("%x", h.Sum(nil))[0:10]
 }
 
-func extractLastValue(raw_response string) (float64, error) {
+func extractLastValue(rawResponse string) (float64, error) {
 	// just take the most recent value
-	parts := strings.Split(strings.Trim(raw_response, "\n\t "), ",")
+	parts := strings.Split(strings.Trim(rawResponse, "\n\t "), ",")
 	return strconv.ParseFloat(parts[len(parts)-1], 64)
 }
 

@@ -16,21 +16,21 @@ import (
 )
 
 var (
-	GraphiteBase   string
-	CarbonBase     string
-	MetricBase     string
-	EmailFrom      string
-	EmailTo        string
-	CheckInterval  int
-	GlobalThrottle int
-	GlobalBackoff  int
-	LastErrorEmail time.Time
-	EmailOnError   bool
-	SMTPServer     string
-	SMTPPort       int
-	SMTPUser       string
-	SMTPPassword   string
-	Window         string
+	graphiteBase   string
+	carbonBase     string
+	metricBase     string
+	emailFrom      string
+	emailTo        string
+	checkInterval  int
+	globalThrottle int
+	globalBackoff  int
+	lastErrorEmail time.Time
+	emailOnError   bool
+	smtpServer     string
+	smtpPort       int
+	smtpUser       string
+	smtpPassword   string
+	window         string
 )
 
 var (
@@ -49,7 +49,7 @@ type config struct {
 	EmailFrom         string `envconfig:"EMAIL_FROM"`
 	EmailTo           string `envconfig:"EMAIL_TO"`
 	CheckInterval     int    `envconfig:"CHECK_INTERVAL"`
-	GlobalThrottle    int    `envconfig:"GlobalThrottle"`
+	GlobalThrottle    int    `envconfig:"GLOBAL_THROTTLE"`
 	HTTPPort          string `envconfig:"HTTP_PORT"`
 	TemplateFile      string `envconfig:"TEMPLATE_FILE"`
 	AlertTemplateFile string `envconfig:"ALERT_TEMPLATE_FILE"`
@@ -76,7 +76,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	f := ConfigData{}
+	f := configData{}
 	err = json.Unmarshal(file, &f)
 	if err != nil {
 		log.Fatal(err)
@@ -104,20 +104,20 @@ func main() {
 
 	log.Info("running on ", c.HTTPPort)
 	// set global values
-	GraphiteBase = c.GraphiteBase
-	CarbonBase = c.CarbonBase
-	MetricBase = c.MetricBase
-	EmailFrom = c.EmailFrom
-	EmailTo = c.EmailTo
-	CheckInterval = c.CheckInterval
-	GlobalThrottle = c.GlobalThrottle
-	GlobalBackoff = 0
-	EmailOnError = c.EmailOnError
-	SMTPServer = c.SMTPServer
-	SMTPPort = c.SMTPPort
-	SMTPUser = c.SMTPUser
-	SMTPPassword = c.SMTPPassword
-	Window = c.Window
+	graphiteBase = c.GraphiteBase
+	carbonBase = c.CarbonBase
+	metricBase = c.MetricBase
+	emailFrom = c.EmailFrom
+	emailTo = c.EmailTo
+	checkInterval = c.CheckInterval
+	globalThrottle = c.GlobalThrottle
+	globalBackoff = 0
+	emailOnError = c.EmailOnError
+	smtpServer = c.SMTPServer
+	smtpPort = c.SMTPPort
+	smtpUser = c.SMTPUser
+	smtpPassword = c.SMTPPassword
+	window = c.Window
 
 	// some defaults
 	if c.ReadTimeout == 0 {
@@ -126,11 +126,11 @@ func main() {
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
 	}
-	if Window == "" {
-		Window = "10mins"
+	if window == "" {
+		window = "10mins"
 	}
 
-	LastErrorEmail = time.Now()
+	lastErrorEmail = time.Now()
 
 	go func() {
 		// update uptime
@@ -141,13 +141,13 @@ func main() {
 	}()
 
 	// initialize all the alerts
-	ac := NewAlertsCollection(smtpEmailer{})
+	ac := newAlertsCollection(smtpEmailer{})
 	for _, a := range f.Alerts {
 		emailTo := a.EmailTo
 		if emailTo == "" {
 			emailTo = c.EmailTo
 		}
-		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, HTTPFetcher{}, emailTo, a.RunBookLink))
+		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
 	}
 
 	// kick it off in the background
@@ -169,7 +169,7 @@ func main() {
 	http.HandleFunc("/alert/",
 		func(w http.ResponseWriter, r *http.Request) {
 			stringIdx := strings.Split(r.URL.String(), "/")[2]
-			pr := ac.MakeIndivPageResponse(stringIdx)
+			pr := ac.MakeindivPageResponse(stringIdx)
 
 			if c.AlertTemplateFile == "" {
 				// default to same location as index.html

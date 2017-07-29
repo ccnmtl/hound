@@ -20,26 +20,26 @@ func (d DummyEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emai
 func (d DummyEmailer) EncounteredErrors(errors int, emailTo string)                         {}
 
 func Test_emptyAlertsCollection(t *testing.T) {
-	ac := NewAlertsCollection(DummyEmailer{})
-	ac.ProcessAll()
+	ac := newAlertsCollection(DummyEmailer{})
+	ac.processAll()
 	ac.DisplayAll()
 	ac.MakePageResponse()
 }
 
-func Test_HandleErrors(t *testing.T) {
-	ac := NewAlertsCollection(DummyEmailer{})
-	ac.HandleErrors(1)
+func Test_handleErrors(t *testing.T) {
+	ac := newAlertsCollection(DummyEmailer{})
+	ac.handleErrors(1)
 }
 
-func Test_AddAlert(t *testing.T) {
-	ac := NewAlertsCollection(DummyEmailer{})
-	a := NewAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	ac.AddAlert(a)
+func Test_addAlert(t *testing.T) {
+	ac := newAlertsCollection(DummyEmailer{})
+	a := newAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
+	ac.addAlert(a)
 
 	ac.DisplayAll()
 	ac.MakePageResponse()
 
-	retrieved := ac.ByHash(a.Hash())
+	retrieved := ac.byHash(a.Hash())
 	if retrieved != a {
 		t.Error("failed to retrieve alert")
 	}

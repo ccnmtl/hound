@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type Emailer interface {
+type emailer interface {
 	EncounteredErrors(int, string)
 	RecoveryThrottled(int, int, string)
 	Throttled(int, int, string)
@@ -14,7 +14,7 @@ type smtpEmailer struct{}
 
 func (e smtpEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 	simpleSendMail(
-		EmailFrom,
+		emailFrom,
 		emailTo,
 		"[ALERT] Hound is throttled",
 		fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
@@ -23,11 +23,11 @@ func (e smtpEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 }
 
 func (e smtpEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emailTo string) {
-	if !EmailOnError {
+	if !emailOnError {
 		return
 	}
 	simpleSendMail(
-		EmailFrom,
+		emailFrom,
 		emailTo,
 		"[ALERT] Hound is recovered",
 		fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
@@ -36,11 +36,11 @@ func (e smtpEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, email
 }
 
 func (e smtpEmailer) EncounteredErrors(errors int, emailTo string) {
-	if !EmailOnError {
+	if !emailOnError {
 		return
 	}
 	simpleSendMail(
-		EmailFrom,
+		emailFrom,
 		emailTo,
 		"[ERROR] Hound encountered errors",
 		fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+

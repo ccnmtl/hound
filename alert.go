@@ -19,7 +19,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type Alert struct {
+type alert struct {
 	Name           string
 	Metric         string
 	Type           string
@@ -30,7 +30,7 @@ type Alert struct {
 	Status         string
 	Message        string
 	PreviousStatus string
-	Fetcher        Fetcher
+	fetcher        fetcher
 	EmailTo        string
 	Value          float64
 	RunBookLink    string
@@ -45,15 +45,15 @@ var dailyColorlist = "%23999999,%23006699"
 var weeklyBgColor = "EEEEEE"
 var weeklyColorlist = "%23cccccc,%236699cc"
 
-func NewAlert(name string, metric string, atype string, threshold float64,
-	direction string, fetcher Fetcher, emailTo string, runbookLink string) *Alert {
+func newAlert(name string, metric string, atype string, threshold float64,
+	direction string, fetcher fetcher, emailTo string, runbookLink string) *alert {
 	if atype == "" {
 		atype = "Alert"
 	}
-	return &Alert{Name: name, Type: atype,
+	return &alert{Name: name, Type: atype,
 		Metric: cleanMetric(metric), Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
-		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: emailTo,
+		PreviousStatus: "OK", fetcher: fetcher, EmailTo: emailTo,
 		Value: 0.0, RunBookLink: runbookLink,
 	}
 }
@@ -63,12 +63,12 @@ func cleanMetric(metric string) string {
 	return re.ReplaceAllString(metric, "")
 }
 
-func (a Alert) URL() string {
-	return GraphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + Window
+func (a alert) URL() string {
+	return graphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + window
 }
 
-func (a Alert) DailyGraphURL() string {
-	return GraphiteBase + "?target=" +
+func (a alert) DailyGraphURL() string {
+	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", graphWidth) +
@@ -78,8 +78,8 @@ func (a Alert) DailyGraphURL() string {
 		dailyColorlist + "&from=-24hours"
 }
 
-func (a Alert) WeeklyGraphURL() string {
-	return GraphiteBase + "?target=" +
+func (a alert) WeeklyGraphURL() string {
+	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", graphWidth) +
@@ -89,18 +89,18 @@ func (a Alert) WeeklyGraphURL() string {
 		"&hideGrid=true&colorList=" + weeklyColorlist + "&from=-7days"
 }
 
-type Fetcher interface {
+type fetcher interface {
 	Get(string) (*http.Response, error)
 }
 
-type HTTPFetcher struct{}
+type httpFetcher struct{}
 
-func (h HTTPFetcher) Get(url string) (*http.Response, error) {
+func (h httpFetcher) Get(url string) (*http.Response, error) {
 	return http.Get(url)
 }
 
-func (a *Alert) Fetch() (float64, error) {
-	resp, err := a.Fetcher.Get(a.URL())
+func (a *alert) Fetch() (float64, error) {
+	resp, err := a.fetcher.Get(a.URL())
 	if err != nil {
 		a.Status = "Error"
 		a.Message = "graphite request failed"
@@ -121,7 +121,7 @@ func (a *Alert) Fetch() (float64, error) {
 	return lv, err
 }
 
-func (a *Alert) CheckMetric() bool {
+func (a *alert) CheckMetric() bool {
 	lv, err := a.Fetch()
 	if err != nil {
 		return false
@@ -131,7 +131,7 @@ func (a *Alert) CheckMetric() bool {
 
 }
 
-func (a *Alert) UpdateStatus(lv float64) {
+func (a *alert) UpdateStatus(lv float64) {
 	a.Value = lv
 	if a.Direction == "above" {
 		// pass if metric is below the threshold
@@ -154,14 +154,14 @@ func (a *Alert) UpdateStatus(lv float64) {
 	}
 }
 
-func (a Alert) String() string {
+func (a alert) String() string {
 	if a.Status == "OK" {
 		return fmt.Sprintf("%s\t%s [%s]", a.Status, a.Name, a.Metric)
 	}
 	return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 }
 
-func (a Alert) RenderDirection() string {
+func (a alert) RenderDirection() string {
 	if a.Status == "OK" {
 		if a.Direction == "above" {
 			return "<"
@@ -175,7 +175,7 @@ func (a Alert) RenderDirection() string {
 
 }
 
-func (a Alert) BootstrapStatus() string {
+func (a alert) BootstrapStatus() string {
 	if a.Status == "OK" {
 		return "OK"
 	}
@@ -185,7 +185,7 @@ func (a Alert) BootstrapStatus() string {
 	return "warning"
 }
 
-func (a Alert) GlyphIcon() string {
+func (a alert) GlyphIcon() string {
 	if a.Type == "Notice" {
 		return "glyphicon-info-sign"
 	}
@@ -193,23 +193,23 @@ func (a Alert) GlyphIcon() string {
 
 }
 
-func (a *Alert) SendRecoveryMessage() {
+func (a *alert) SendRecoveryMessage() {
 	log.WithFields(
 		log.Fields{
 			"name": a.Name,
 		},
 	).Debug("sending Recovery Message")
-	simpleSendMail(EmailFrom,
+	simpleSendMail(emailFrom,
 		a.EmailTo,
 		a.RecoveryEmailSubject(),
 		a.RecoveryEmailBody())
 }
 
-func (a *Alert) RecoveryEmailSubject() string {
+func (a *alert) RecoveryEmailSubject() string {
 	return fmt.Sprintf("[RECOVERED] %s", a.Name)
 }
 
-func (a *Alert) RecoveryEmailBody() string {
+func (a *alert) RecoveryEmailBody() string {
 	return fmt.Sprintf("%s [%s] has returned %s %f", a.Name, a.Metric, invertDirection(a.Direction), a.Threshold)
 }
 
@@ -220,7 +220,7 @@ func invertDirection(d string) string {
 	return "above"
 }
 
-func (a *Alert) Throttled() bool {
+func (a *alert) Throttled() bool {
 	if a.Backoff == 0 {
 		return false
 	}
@@ -229,50 +229,50 @@ func (a *Alert) Throttled() bool {
 	return time.Now().Before(window)
 }
 
-func (a *Alert) SendAlert() {
+func (a *alert) SendAlert() {
 	log.WithFields(
 		log.Fields{
 			"name": a.Name,
 		},
 	).Debug("Sending Alert")
-	simpleSendMail(EmailFrom,
+	simpleSendMail(emailFrom,
 		a.EmailTo,
-		a.AlertEmailSubject(),
-		a.AlertEmailBody())
+		a.alertEmailSubject(),
+		a.alertEmailBody())
 }
 
-func (a *Alert) AlertEmailSubject() string {
+func (a *alert) alertEmailSubject() string {
 	if a.Type == "Alert" {
 		return fmt.Sprintf("[ALERT] %s", a.Name)
 	}
 	return fmt.Sprintf("[NOTICE] %s", a.Name)
 }
 
-func (a *Alert) IncludeRunBookLink() string {
+func (a *alert) IncludeRunBookLink() string {
 	if a.RunBookLink == "" {
 		return ""
 	}
 	return fmt.Sprintf("\n\nRunbook link:\n%s\n", a.RunBookLink)
 }
 
-func (a *Alert) AlertEmailBody() string {
+func (a *alert) alertEmailBody() string {
 	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>%s\n",
 		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphURL(), a.WeeklyGraphURL(), a.IncludeRunBookLink())
 }
 
 // did this alert just return to a healthy state?
 // returns 1 if just recovered, 0 otherwise
-func (a *Alert) JustRecovered() bool {
+func (a *alert) JustRecovered() bool {
 	return a.PreviousStatus == "Failed" || a.PreviousStatus == "Error"
 }
 
-func (a *Alert) SendRecoveryMessageIfNeeded(recoveriesSent int) {
-	if a.JustRecovered() && recoveriesSent < GlobalThrottle {
+func (a *alert) SendRecoveryMessageIfNeeded(recoveriesSent int) {
+	if a.JustRecovered() && recoveriesSent < globalThrottle {
 		a.SendRecoveryMessage()
 	}
 }
 
-func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
+func (a *alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	successes := 0
 	errors := 0
 	failures := 0
@@ -301,7 +301,7 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 				},
 			).Debug("throttled")
 		} else {
-			if a.Status == "Failed" && alertsSent < GlobalThrottle {
+			if a.Status == "Failed" && alertsSent < globalThrottle {
 				a.SendAlert()
 				alertsSent++
 			}
@@ -314,7 +314,7 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	return successes, recoveriesSent, errors, failures, alertsSent
 }
 
-func (a Alert) Hash() string {
+func (a alert) Hash() string {
 	h := sha1.New()
 	io.WriteString(h, fmt.Sprintf("metric: %s", a.Metric))
 	io.WriteString(h, fmt.Sprintf("direction: %s", a.Direction))
@@ -350,10 +350,10 @@ func simpleSendMail(from, to, subject string, body string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
-	s := fmt.Sprintf("%s:%d", SMTPServer, SMTPPort)
-	auth := smtp.PlainAuth("", SMTPUser, SMTPPassword, SMTPServer)
+	s := fmt.Sprintf("%s:%d", smtpServer, smtpPort)
+	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpServer)
 
-	if SMTPPort == 25 {
+	if smtpPort == 25 {
 		err := SendMail(s, auth, from, []string{to}, []byte(message))
 		if err != nil {
 			log.WithFields(
@@ -367,7 +367,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	}
 	tlsconfig := &tls.Config{
 		InsecureSkipVerify: true,
-		ServerName:         SMTPServer,
+		ServerName:         smtpServer,
 	}
 
 	conn, err := tls.Dial("tcp", s, tlsconfig)
@@ -376,7 +376,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 		return err
 	}
 
-	c, err := smtp.NewClient(conn, SMTPServer)
+	c, err := smtp.NewClient(conn, smtpServer)
 	if err != nil {
 		log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
 		return err
@@ -387,9 +387,9 @@ func simpleSendMail(from, to, subject string, body string) error {
 		log.WithFields(
 			log.Fields{
 				"err":           err,
-				"SMTP_USER":     SMTPUser,
-				"SMTP_PASSWORD": SMTPPassword,
-				"SMTP_SERVER":   SMTPServer,
+				"SMTP_USER":     smtpUser,
+				"SMTP_PASSWORD": smtpPassword,
+				"SMTP_SERVER":   smtpServer,
 			}).Error("auth failed")
 		return err
 	}

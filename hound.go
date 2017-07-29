@@ -141,7 +141,7 @@ func main() {
 	}()
 
 	// initialize all the alerts
-	ac := NewAlertsCollection(SMTPEmailer{})
+	ac := NewAlertsCollection(smtpEmailer{})
 	for _, a := range f.Alerts {
 		emailTo := a.EmailTo
 		if emailTo == "" {

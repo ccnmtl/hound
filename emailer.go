@@ -10,9 +10,9 @@ type Emailer interface {
 	Throttled(int, int, string)
 }
 
-type SMTPEmailer struct{}
+type smtpEmailer struct{}
 
-func (e SMTPEmailer) Throttled(failures, globalThrottle int, emailTo string) {
+func (e smtpEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 	simpleSendMail(
 		EmailFrom,
 		emailTo,
@@ -22,7 +22,7 @@ func (e SMTPEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 			globalThrottle))
 }
 
-func (e SMTPEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emailTo string) {
+func (e smtpEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emailTo string) {
 	if !EmailOnError {
 		return
 	}
@@ -35,7 +35,7 @@ func (e SMTPEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, email
 			globalThrottle))
 }
 
-func (e SMTPEmailer) EncounteredErrors(errors int, emailTo string) {
+func (e smtpEmailer) EncounteredErrors(errors int, emailTo string) {
 	if !EmailOnError {
 		return
 	}

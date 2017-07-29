@@ -12,17 +12,17 @@ type Emailer interface {
 
 type SMTPEmailer struct{}
 
-func (e SMTPEmailer) Throttled(failures, global_throttle int, emailTo string) {
+func (e SMTPEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 	simpleSendMail(
 		EmailFrom,
 		emailTo,
 		"[ALERT] Hound is throttled",
 		fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
 			"This probably indicates an infrastructure problem (network, graphite, etc)", failures,
-			global_throttle))
+			globalThrottle))
 }
 
-func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, emailTo string) {
+func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, globalThrottle int, emailTo string) {
 	if !EmailOnError {
 		return
 	}
@@ -32,7 +32,7 @@ func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, ema
 		"[ALERT] Hound is recovered",
 		fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
 			recoveries_sent,
-			global_throttle))
+			globalThrottle))
 }
 
 func (e SMTPEmailer) EncounteredErrors(errors int, emailTo string) {

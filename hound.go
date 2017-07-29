@@ -39,7 +39,7 @@ var (
 	ExpErrors         = expvar.NewInt("errors")
 	ExpGlobalThrottle = expvar.NewInt("throttle")
 	ExpGlobalBackoff  = expvar.NewInt("backoff")
-	EXP_UPTIME        = expvar.NewInt("uptime")
+	ExpUptime         = expvar.NewInt("uptime")
 )
 
 type config struct {
@@ -136,7 +136,7 @@ func main() {
 		// update uptime
 		for {
 			time.Sleep(1 * time.Second)
-			EXP_UPTIME.Add(1)
+			ExpUptime.Add(1)
 		}
 	}()
 

@@ -23,7 +23,7 @@ func (e SMTPEmailer) Throttled(failures, global_throttle int, emailTo string) {
 }
 
 func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, emailTo string) {
-	if !EMAIL_ON_ERROR {
+	if !EmailOnError {
 		return
 	}
 	simpleSendMail(
@@ -36,7 +36,7 @@ func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, ema
 }
 
 func (e SMTPEmailer) EncounteredErrors(errors int, emailTo string) {
-	if !EMAIL_ON_ERROR {
+	if !EmailOnError {
 		return
 	}
 	simpleSendMail(

@@ -20,7 +20,7 @@ var (
 	CarbonBase       string
 	MetricBase       string
 	EmailFrom        string
-	EMAIL_TO         string
+	EmailTo          string
 	CHECK_INTERVAL   int
 	GLOBAL_THROTTLE  int
 	GLOBAL_BACKOFF   int
@@ -108,7 +108,7 @@ func main() {
 	CarbonBase = c.CarbonBase
 	MetricBase = c.MetricBase
 	EmailFrom = c.EmailFrom
-	EMAIL_TO = c.EmailTo
+	EmailTo = c.EmailTo
 	CHECK_INTERVAL = c.CheckInterval
 	GLOBAL_THROTTLE = c.GlobalThrottle
 	GLOBAL_BACKOFF = 0

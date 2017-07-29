@@ -90,7 +90,7 @@ func (ac *AlertsCollection) HandleErrors(errors int) {
 		if time.Now().After(window) {
 			ac.Emailer.EncounteredErrors(errors, EmailTo)
 			LastErrorEmail = time.Now()
-			GlobalBackoff = intmin(GlobalBackoff+1, len(BACKOFF_DURATIONS))
+			GlobalBackoff = intmin(GlobalBackoff+1, len(backoffDurations))
 		}
 	} else {
 		GlobalBackoff = 0

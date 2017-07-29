@@ -310,7 +310,7 @@ func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 				a.SendAlert()
 				alertsSent++
 			}
-			a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
+			a.Backoff = intmin(a.Backoff+1, len(backoffDurations))
 			a.LastAlerted = time.Now()
 		}
 	}
@@ -441,7 +441,7 @@ func encodeRFC2047(String string) string {
 	return strings.Trim(addr.String(), " <>")
 }
 
-var BACKOFF_DURATIONS = []time.Duration{
+var backoffDurations = []time.Duration{
 	time.Duration(5) * time.Minute,
 	time.Duration(30) * time.Minute,
 	time.Duration(1) * time.Hour,
@@ -452,5 +452,5 @@ var BACKOFF_DURATIONS = []time.Duration{
 }
 
 func backoffTime(level int) time.Duration {
-	return BACKOFF_DURATIONS[level]
+	return backoffDurations[level]
 }

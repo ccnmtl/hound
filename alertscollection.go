@@ -76,7 +76,7 @@ func (ac *AlertsCollection) ProcessAll() {
 }
 
 func ExposeVars(failures, errors, successes int) {
-	EXP_FAILED.Set(int64(failures))
+	ExpFailed.Set(int64(failures))
 	EXP_ERRORS.Set(int64(errors))
 	EXP_PASSED.Set(int64(successes))
 	EXP_GLOBAL_THROTTLE.Set(int64(GlobalThrottle))

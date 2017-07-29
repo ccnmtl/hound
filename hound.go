@@ -34,7 +34,7 @@ var (
 )
 
 var (
-	EXP_FAILED          = expvar.NewInt("failed")
+	ExpFailed           = expvar.NewInt("failed")
 	EXP_PASSED          = expvar.NewInt("passed")
 	EXP_ERRORS          = expvar.NewInt("errors")
 	EXP_GLOBAL_THROTTLE = expvar.NewInt("throttle")

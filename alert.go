@@ -64,11 +64,11 @@ func cleanMetric(metric string) string {
 }
 
 func (a Alert) Url() string {
-	return GRAPHITE_BASE + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + WINDOW
+	return GraphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + WINDOW
 }
 
 func (a Alert) DailyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" +
+	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +
@@ -79,7 +79,7 @@ func (a Alert) DailyGraphUrl() string {
 }
 
 func (a Alert) WeeklyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" +
+	return GraphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +

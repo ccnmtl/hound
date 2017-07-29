@@ -138,7 +138,7 @@ func (ac *AlertsCollection) DisplayAll() {
 }
 
 func (ac *AlertsCollection) MakePageResponse() PageResponse {
-	pr := PageResponse{GraphiteBase: GRAPHITE_BASE,
+	pr := PageResponse{GraphiteBase: GraphiteBase,
 		MetricBase: METRIC_BASE}
 	for _, a := range ac.Alerts {
 		pr.Alerts = append(pr.Alerts, a)
@@ -147,7 +147,7 @@ func (ac *AlertsCollection) MakePageResponse() PageResponse {
 }
 
 func (ac *AlertsCollection) MakeIndivPageResponse(idx string) IndivPageResponse {
-	return IndivPageResponse{GraphiteBase: GRAPHITE_BASE,
+	return IndivPageResponse{GraphiteBase: GraphiteBase,
 		MetricBase: METRIC_BASE,
 		Alert:      ac.ByHash(idx)}
 }

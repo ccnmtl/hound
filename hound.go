@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	GRAPHITE_BASE    string
+	GraphiteBase     string
 	CARBON_BASE      string
 	METRIC_BASE      string
 	EMAIL_FROM       string
@@ -104,7 +104,7 @@ func main() {
 
 	log.Info("running on ", c.HTTPPort)
 	// set global values
-	GRAPHITE_BASE = c.GraphiteBase
+	GraphiteBase = c.GraphiteBase
 	CARBON_BASE = c.CarbonBase
 	METRIC_BASE = c.MetricBase
 	EMAIL_FROM = c.EmailFrom

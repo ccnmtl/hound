@@ -63,12 +63,12 @@ func (ac *AlertsCollection) ProcessAll() {
 		failures = failures + f
 		alerts_sent = alerts_sent + as
 	}
-	if alerts_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE, EmailTo)
+	if alerts_sent >= GlobalThrottle {
+		ac.Emailer.Throttled(failures, GlobalThrottle, EmailTo)
 	}
 
-	if recoveries_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE, EmailTo)
+	if recoveries_sent >= GlobalThrottle {
+		ac.Emailer.RecoveryThrottled(recoveries_sent, GlobalThrottle, EmailTo)
 	}
 	ac.HandleErrors(errors)
 	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
@@ -79,7 +79,7 @@ func ExposeVars(failures, errors, successes int) {
 	EXP_FAILED.Set(int64(failures))
 	EXP_ERRORS.Set(int64(errors))
 	EXP_PASSED.Set(int64(successes))
-	EXP_GLOBAL_THROTTLE.Set(int64(GLOBAL_THROTTLE))
+	EXP_GLOBAL_THROTTLE.Set(int64(GlobalThrottle))
 	EXP_GLOBAL_BACKOFF.Set(int64(GLOBAL_BACKOFF))
 }
 

@@ -272,7 +272,7 @@ func (a *Alert) JustRecovered() bool {
 }
 
 func (a *Alert) SendRecoveryMessageIfNeeded(recoveries_sent int) {
-	if a.JustRecovered() && recoveries_sent < GLOBAL_THROTTLE {
+	if a.JustRecovered() && recoveries_sent < GlobalThrottle {
 		a.SendRecoveryMessage()
 	}
 }
@@ -306,7 +306,7 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 				},
 			).Debug("throttled")
 		} else {
-			if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
+			if a.Status == "Failed" && alerts_sent < GlobalThrottle {
 				a.SendAlert()
 				alerts_sent++
 			}

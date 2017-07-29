@@ -22,7 +22,7 @@ var (
 	EmailFrom        string
 	EmailTo          string
 	CheckInterval    int
-	GLOBAL_THROTTLE  int
+	GlobalThrottle   int
 	GLOBAL_BACKOFF   int
 	LAST_ERROR_EMAIL time.Time
 	EMAIL_ON_ERROR   bool
@@ -49,7 +49,7 @@ type config struct {
 	EmailFrom         string `envconfig:"EMAIL_FROM"`
 	EmailTo           string `envconfig:"EMAIL_TO"`
 	CheckInterval     int    `envconfig:"CHECK_INTERVAL"`
-	GlobalThrottle    int    `envconfig:"GLOBAL_THROTTLE"`
+	GlobalThrottle    int    `envconfig:"GlobalThrottle"`
 	HTTPPort          string `envconfig:"HTTP_PORT"`
 	TemplateFile      string `envconfig:"TEMPLATE_FILE"`
 	AlertTemplateFile string `envconfig:"ALERT_TEMPLATE_FILE"`
@@ -110,7 +110,7 @@ func main() {
 	EmailFrom = c.EmailFrom
 	EmailTo = c.EmailTo
 	CheckInterval = c.CheckInterval
-	GLOBAL_THROTTLE = c.GlobalThrottle
+	GlobalThrottle = c.GlobalThrottle
 	GLOBAL_BACKOFF = 0
 	EMAIL_ON_ERROR = c.EmailOnError
 	SMTP_SERVER = c.SMTPServer

@@ -80,7 +80,7 @@ func ExposeVars(failures, errors, successes int) {
 	ExpErrors.Set(int64(errors))
 	ExpPassed.Set(int64(successes))
 	ExpGlobalThrottle.Set(int64(GlobalThrottle))
-	EXP_GLOBAL_BACKOFF.Set(int64(GlobalBackoff))
+	ExpGlobalBackoff.Set(int64(GlobalBackoff))
 }
 
 func (ac *AlertsCollection) HandleErrors(errors int) {

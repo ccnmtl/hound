@@ -34,12 +34,12 @@ var (
 )
 
 var (
-	ExpFailed          = expvar.NewInt("failed")
-	ExpPassed          = expvar.NewInt("passed")
-	ExpErrors          = expvar.NewInt("errors")
-	ExpGlobalThrottle  = expvar.NewInt("throttle")
-	EXP_GLOBAL_BACKOFF = expvar.NewInt("backoff")
-	EXP_UPTIME         = expvar.NewInt("uptime")
+	ExpFailed         = expvar.NewInt("failed")
+	ExpPassed         = expvar.NewInt("passed")
+	ExpErrors         = expvar.NewInt("errors")
+	ExpGlobalThrottle = expvar.NewInt("throttle")
+	ExpGlobalBackoff  = expvar.NewInt("backoff")
+	EXP_UPTIME        = expvar.NewInt("uptime")
 )
 
 type config struct {

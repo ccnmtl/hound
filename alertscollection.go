@@ -99,7 +99,7 @@ func (ac *AlertsCollection) HandleErrors(errors int) {
 
 func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int) {
 	var clientGraphite net.Conn
-	clientGraphite, err := net.Dial("tcp", CARBON_BASE)
+	clientGraphite, err := net.Dial("tcp", CarbonBase)
 	if err != nil || clientGraphite == nil {
 		return
 	}

@@ -17,7 +17,7 @@ import (
 
 var (
 	GraphiteBase     string
-	CARBON_BASE      string
+	CarbonBase       string
 	METRIC_BASE      string
 	EMAIL_FROM       string
 	EMAIL_TO         string
@@ -105,7 +105,7 @@ func main() {
 	log.Info("running on ", c.HTTPPort)
 	// set global values
 	GraphiteBase = c.GraphiteBase
-	CARBON_BASE = c.CarbonBase
+	CarbonBase = c.CarbonBase
 	METRIC_BASE = c.MetricBase
 	EMAIL_FROM = c.EmailFrom
 	EMAIL_TO = c.EmailTo

@@ -37,13 +37,13 @@ type Alert struct {
 }
 
 var graphWidth = 800
-var DAILY_GRAPH_HEIGHT = 150
-var WEEKLY_GRAPH_HEIGHT = 75
-var FGCOLOR = "000000"
-var DAILY_BGCOLOR = "FFFFFF"
-var DAILY_COLORLIST = "%23999999,%23006699"
-var WEEKLY_BGCOLOR = "EEEEEE"
-var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
+var dailyGraphHeight = 150
+var weeklyGraphHeight = 75
+var fgColor = "000000"
+var dailyBgColor = "FFFFFF"
+var dailyColorlist = "%23999999,%23006699"
+var weeklyBgColor = "EEEEEE"
+var weeklyColorlist = "%23cccccc,%236699cc"
 
 func NewAlert(name string, metric string, atype string, threshold float64,
 	direction string, fetcher Fetcher, emailTo string, runbookLink string) *Alert {
@@ -72,10 +72,10 @@ func (a Alert) DailyGraphUrl() string {
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", graphWidth) +
-		"&height=" + fmt.Sprintf("%d", DAILY_GRAPH_HEIGHT) +
-		"&bgcolor=" + DAILY_BGCOLOR +
-		"&fgcolor=" + FGCOLOR + "&hideGrid=true&colorList=" +
-		DAILY_COLORLIST + "&from=-24hours"
+		"&height=" + fmt.Sprintf("%d", dailyGraphHeight) +
+		"&bgcolor=" + dailyBgColor +
+		"&fgcolor=" + fgColor + "&hideGrid=true&colorList=" +
+		dailyColorlist + "&from=-24hours"
 }
 
 func (a Alert) WeeklyGraphUrl() string {
@@ -83,10 +83,10 @@ func (a Alert) WeeklyGraphUrl() string {
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
 		")&width=" + fmt.Sprintf("%d", graphWidth) +
-		"&height=" + fmt.Sprintf("%d", WEEKLY_GRAPH_HEIGHT) +
+		"&height=" + fmt.Sprintf("%d", weeklyGraphHeight) +
 		"&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=" +
-		WEEKLY_BGCOLOR + "&fgcolor=" + FGCOLOR +
-		"&hideGrid=true&colorList=" + WEEKLY_COLORLIST + "&from=-7days"
+		weeklyBgColor + "&fgcolor=" + fgColor +
+		"&hideGrid=true&colorList=" + weeklyColorlist + "&from=-7days"
 }
 
 type Fetcher interface {

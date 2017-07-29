@@ -355,8 +355,8 @@ func simpleSendMail(from, to, subject string, body string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
-	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
-	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, SMTP_SERVER)
+	s := fmt.Sprintf("%s:%d", SMTPServer, SMTP_PORT)
+	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, SMTPServer)
 
 	if SMTP_PORT == 25 {
 		err := SendMail(s, auth, from, []string{to}, []byte(message))
@@ -372,7 +372,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	} else {
 		tlsconfig := &tls.Config{
 			InsecureSkipVerify: true,
-			ServerName:         SMTP_SERVER,
+			ServerName:         SMTPServer,
 		}
 
 		conn, err := tls.Dial("tcp", s, tlsconfig)
@@ -381,7 +381,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 			return err
 		}
 
-		c, err := smtp.NewClient(conn, SMTP_SERVER)
+		c, err := smtp.NewClient(conn, SMTPServer)
 		if err != nil {
 			log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
 			return err
@@ -394,7 +394,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 					"err":           err,
 					"SMTP_USER":     SMTP_USER,
 					"SMTP_PASSWORD": SMTP_PASSWORD,
-					"SMTP_SERVER":   SMTP_SERVER,
+					"SMTP_SERVER":   SMTPServer,
 				}).Error("auth failed")
 			return err
 		}

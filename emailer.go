@@ -22,7 +22,7 @@ func (e SMTPEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 			globalThrottle))
 }
 
-func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, globalThrottle int, emailTo string) {
+func (e SMTPEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emailTo string) {
 	if !EmailOnError {
 		return
 	}
@@ -31,7 +31,7 @@ func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, globalThrottle int, emai
 		emailTo,
 		"[ALERT] Hound is recovered",
 		fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
-			recoveries_sent,
+			recoveriesSent,
 			globalThrottle))
 }
 

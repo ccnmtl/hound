@@ -50,15 +50,15 @@ func (ac *AlertsCollection) ProcessAll() {
 	// fetch/calculate new status for all
 	ac.CheckAll()
 	alerts_sent := 0
-	recoveries_sent := 0
+	recoveriesSent := 0
 	errors := 0
 	failures := 0
 	successes := 0
 
 	for _, a := range ac.Alerts {
-		s, rs, e, f, as := a.UpdateState(recoveries_sent)
+		s, rs, e, f, as := a.UpdateState(recoveriesSent)
 		successes = successes + s
-		recoveries_sent = recoveries_sent + rs
+		recoveriesSent = recoveriesSent + rs
 		errors = errors + e
 		failures = failures + f
 		alerts_sent = alerts_sent + as
@@ -67,11 +67,11 @@ func (ac *AlertsCollection) ProcessAll() {
 		ac.Emailer.Throttled(failures, GlobalThrottle, EmailTo)
 	}
 
-	if recoveries_sent >= GlobalThrottle {
-		ac.Emailer.RecoveryThrottled(recoveries_sent, GlobalThrottle, EmailTo)
+	if recoveriesSent >= GlobalThrottle {
+		ac.Emailer.RecoveryThrottled(recoveriesSent, GlobalThrottle, EmailTo)
 	}
 	ac.HandleErrors(errors)
-	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
+	LogToGraphite(alerts_sent, recoveriesSent, failures, errors, successes)
 	ExposeVars(failures, errors, successes)
 }
 
@@ -97,7 +97,7 @@ func (ac *AlertsCollection) HandleErrors(errors int) {
 	}
 }
 
-func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int) {
+func LogToGraphite(alerts_sent, recoveriesSent, failures, errors, successes int) {
 	var clientGraphite net.Conn
 	clientGraphite, err := net.Dial("tcp", CarbonBase)
 	if err != nil || clientGraphite == nil {
@@ -108,7 +108,7 @@ func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int
 	buffer := bytes.NewBufferString("")
 
 	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", MetricBase, alerts_sent, now)
-	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", MetricBase, recoveries_sent, now)
+	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", MetricBase, recoveriesSent, now)
 	fmt.Fprintf(buffer, "%sfailures %d %d\n", MetricBase, failures, now)
 	fmt.Fprintf(buffer, "%serrors %d %d\n", MetricBase, errors, now)
 	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", MetricBase, successes, now)

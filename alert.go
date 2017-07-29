@@ -271,13 +271,13 @@ func (a *Alert) JustRecovered() bool {
 	return a.PreviousStatus == "Failed" || a.PreviousStatus == "Error"
 }
 
-func (a *Alert) SendRecoveryMessageIfNeeded(recoveries_sent int) {
-	if a.JustRecovered() && recoveries_sent < GlobalThrottle {
+func (a *Alert) SendRecoveryMessageIfNeeded(recoveriesSent int) {
+	if a.JustRecovered() && recoveriesSent < GlobalThrottle {
 		a.SendRecoveryMessage()
 	}
 }
 
-func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
+func (a *Alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	successes := 0
 	errors := 0
 	failures := 0
@@ -285,9 +285,9 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 
 	if a.Status == "OK" {
 		successes++
-		a.SendRecoveryMessageIfNeeded(recoveries_sent)
+		a.SendRecoveryMessageIfNeeded(recoveriesSent)
 		if a.JustRecovered() {
-			recoveries_sent++
+			recoveriesSent++
 		}
 		a.Backoff = 0
 	} else {
@@ -302,7 +302,7 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 			// wait for the throttling to expire
 			log.WithFields(
 				log.Fields{
-					"recoveries_sent": recoveries_sent,
+					"recoveriesSent": recoveriesSent,
 				},
 			).Debug("throttled")
 		} else {
@@ -316,7 +316,7 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 	}
 	// cycle the previous status
 	a.PreviousStatus = a.Status
-	return successes, recoveries_sent, errors, failures, alerts_sent
+	return successes, recoveriesSent, errors, failures, alerts_sent
 }
 
 func (a Alert) Hash() string {

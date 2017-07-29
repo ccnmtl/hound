@@ -79,7 +79,7 @@ func ExposeVars(failures, errors, successes int) {
 	ExpFailed.Set(int64(failures))
 	ExpErrors.Set(int64(errors))
 	ExpPassed.Set(int64(successes))
-	EXP_GLOBAL_THROTTLE.Set(int64(GlobalThrottle))
+	ExpGlobalThrottle.Set(int64(GlobalThrottle))
 	EXP_GLOBAL_BACKOFF.Set(int64(GlobalBackoff))
 }
 

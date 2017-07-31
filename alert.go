@@ -437,7 +437,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 
 func encodeRFC2047(String string) string {
 	// use mail's rfc2047 to encode any string
-	addr := mail.Address{String, ""}
+	addr := mail.Address{Name: String, Address: ""}
 	return strings.Trim(addr.String(), " <>")
 }
 

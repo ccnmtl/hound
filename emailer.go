@@ -4,44 +4,44 @@ import (
 	"fmt"
 )
 
-type Emailer interface {
+type emailer interface {
 	EncounteredErrors(int, string)
 	RecoveryThrottled(int, int, string)
 	Throttled(int, int, string)
 }
 
-type SMTPEmailer struct{}
+type smtpEmailer struct{}
 
-func (e SMTPEmailer) Throttled(failures, global_throttle int, email_to string) {
+func (e smtpEmailer) Throttled(failures, globalThrottle int, emailTo string) {
 	simpleSendMail(
-		EMAIL_FROM,
-		email_to,
+		emailFrom,
+		emailTo,
 		"[ALERT] Hound is throttled",
 		fmt.Sprintf("%d metrics were not OK.\nHound stopped sending messages after %d.\n"+
 			"This probably indicates an infrastructure problem (network, graphite, etc)", failures,
-			global_throttle))
+			globalThrottle))
 }
 
-func (e SMTPEmailer) RecoveryThrottled(recoveries_sent, global_throttle int, email_to string) {
-	if !EMAIL_ON_ERROR {
+func (e smtpEmailer) RecoveryThrottled(recoveriesSent, globalThrottle int, emailTo string) {
+	if !emailOnError {
 		return
 	}
 	simpleSendMail(
-		EMAIL_FROM,
-		email_to,
+		emailFrom,
+		emailTo,
 		"[ALERT] Hound is recovered",
 		fmt.Sprintf("%d metrics recovered.\nHound stopped sending individual messages after %d.\n",
-			recoveries_sent,
-			global_throttle))
+			recoveriesSent,
+			globalThrottle))
 }
 
-func (e SMTPEmailer) EncounteredErrors(errors int, email_to string) {
-	if !EMAIL_ON_ERROR {
+func (e smtpEmailer) EncounteredErrors(errors int, emailTo string) {
+	if !emailOnError {
 		return
 	}
 	simpleSendMail(
-		EMAIL_FROM,
-		email_to,
+		emailFrom,
+		emailTo,
 		"[ERROR] Hound encountered errors",
 		fmt.Sprintf("%d metrics had errors. If this is more than a couple, it usually "+
 			"means that Graphite has fallen behind. It doesn't necessarily mean "+

@@ -16,30 +16,30 @@ import (
 )
 
 var (
-	GRAPHITE_BASE    string
-	CARBON_BASE      string
-	METRIC_BASE      string
-	EMAIL_FROM       string
-	EMAIL_TO         string
-	CHECK_INTERVAL   int
-	GLOBAL_THROTTLE  int
-	GLOBAL_BACKOFF   int
-	LAST_ERROR_EMAIL time.Time
-	EMAIL_ON_ERROR   bool
-	SMTP_SERVER      string
-	SMTP_PORT        int
-	SMTP_USER        string
-	SMTP_PASSWORD    string
-	WINDOW           string
+	graphiteBase   string
+	carbonBase     string
+	metricBase     string
+	emailFrom      string
+	emailTo        string
+	checkInterval  int
+	globalThrottle int
+	globalBackoff  int
+	lastErrorEmail time.Time
+	emailOnError   bool
+	smtpServer     string
+	smtpPort       int
+	smtpUser       string
+	smtpPassword   string
+	window         string
 )
 
 var (
-	EXP_FAILED          = expvar.NewInt("failed")
-	EXP_PASSED          = expvar.NewInt("passed")
-	EXP_ERRORS          = expvar.NewInt("errors")
-	EXP_GLOBAL_THROTTLE = expvar.NewInt("throttle")
-	EXP_GLOBAL_BACKOFF  = expvar.NewInt("backoff")
-	EXP_UPTIME          = expvar.NewInt("uptime")
+	expFailed         = expvar.NewInt("failed")
+	expPassed         = expvar.NewInt("passed")
+	expErrors         = expvar.NewInt("errors")
+	expGlobalThrottle = expvar.NewInt("throttle")
+	expGlobalBackoff  = expvar.NewInt("backoff")
+	expUptime         = expvar.NewInt("uptime")
 )
 
 type config struct {
@@ -76,7 +76,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	f := ConfigData{}
+	f := configData{}
 	err = json.Unmarshal(file, &f)
 	if err != nil {
 		log.Fatal(err)
@@ -104,20 +104,20 @@ func main() {
 
 	log.Info("running on ", c.HTTPPort)
 	// set global values
-	GRAPHITE_BASE = c.GraphiteBase
-	CARBON_BASE = c.CarbonBase
-	METRIC_BASE = c.MetricBase
-	EMAIL_FROM = c.EmailFrom
-	EMAIL_TO = c.EmailTo
-	CHECK_INTERVAL = c.CheckInterval
-	GLOBAL_THROTTLE = c.GlobalThrottle
-	GLOBAL_BACKOFF = 0
-	EMAIL_ON_ERROR = c.EmailOnError
-	SMTP_SERVER = c.SMTPServer
-	SMTP_PORT = c.SMTPPort
-	SMTP_USER = c.SMTPUser
-	SMTP_PASSWORD = c.SMTPPassword
-	WINDOW = c.Window
+	graphiteBase = c.GraphiteBase
+	carbonBase = c.CarbonBase
+	metricBase = c.MetricBase
+	emailFrom = c.EmailFrom
+	emailTo = c.EmailTo
+	checkInterval = c.CheckInterval
+	globalThrottle = c.GlobalThrottle
+	globalBackoff = 0
+	emailOnError = c.EmailOnError
+	smtpServer = c.SMTPServer
+	smtpPort = c.SMTPPort
+	smtpUser = c.SMTPUser
+	smtpPassword = c.SMTPPassword
+	window = c.Window
 
 	// some defaults
 	if c.ReadTimeout == 0 {
@@ -126,28 +126,28 @@ func main() {
 	if c.WriteTimeout == 0 {
 		c.WriteTimeout = 10
 	}
-	if WINDOW == "" {
-		WINDOW = "10mins"
+	if window == "" {
+		window = "10mins"
 	}
 
-	LAST_ERROR_EMAIL = time.Now()
+	lastErrorEmail = time.Now()
 
 	go func() {
 		// update uptime
 		for {
 			time.Sleep(1 * time.Second)
-			EXP_UPTIME.Add(1)
+			expUptime.Add(1)
 		}
 	}()
 
 	// initialize all the alerts
-	ac := NewAlertsCollection(SMTPEmailer{})
+	ac := newAlertsCollection(smtpEmailer{})
 	for _, a := range f.Alerts {
-		email_to := a.EmailTo
-		if email_to == "" {
-			email_to = c.EmailTo
+		emailTo := a.EmailTo
+		if emailTo == "" {
+			emailTo = c.EmailTo
 		}
-		ac.AddAlert(NewAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, HTTPFetcher{}, email_to, a.RunBookLink))
+		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
 	}
 
 	// kick it off in the background
@@ -169,7 +169,7 @@ func main() {
 	http.HandleFunc("/alert/",
 		func(w http.ResponseWriter, r *http.Request) {
 			stringIdx := strings.Split(r.URL.String(), "/")[2]
-			pr := ac.MakeIndivPageResponse(stringIdx)
+			pr := ac.MakeindivPageResponse(stringIdx)
 
 			if c.AlertTemplateFile == "" {
 				// default to same location as index.html

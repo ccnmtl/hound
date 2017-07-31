@@ -19,7 +19,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type Alert struct {
+type alert struct {
 	Name           string
 	Metric         string
 	Type           string
@@ -30,31 +30,31 @@ type Alert struct {
 	Status         string
 	Message        string
 	PreviousStatus string
-	Fetcher        Fetcher
+	fetcher        fetcher
 	EmailTo        string
 	Value          float64
 	RunBookLink    string
 }
 
-var GRAPH_WIDTH = 800
-var DAILY_GRAPH_HEIGHT = 150
-var WEEKLY_GRAPH_HEIGHT = 75
-var FGCOLOR = "000000"
-var DAILY_BGCOLOR = "FFFFFF"
-var DAILY_COLORLIST = "%23999999,%23006699"
-var WEEKLY_BGCOLOR = "EEEEEE"
-var WEEKLY_COLORLIST = "%23cccccc,%236699cc"
+var graphWidth = 800
+var dailyGraphHeight = 150
+var weeklyGraphHeight = 75
+var fgColor = "000000"
+var dailyBgColor = "FFFFFF"
+var dailyColorlist = "%23999999,%23006699"
+var weeklyBgColor = "EEEEEE"
+var weeklyColorlist = "%23cccccc,%236699cc"
 
-func NewAlert(name string, metric string, atype string, threshold float64,
-	direction string, fetcher Fetcher, email_to string, runbook_link string) *Alert {
+func newAlert(name string, metric string, atype string, threshold float64,
+	direction string, fetcher fetcher, emailTo string, runbookLink string) *alert {
 	if atype == "" {
 		atype = "Alert"
 	}
-	return &Alert{Name: name, Type: atype,
+	return &alert{Name: name, Type: atype,
 		Metric: cleanMetric(metric), Threshold: threshold, Direction: direction,
 		Backoff: 0, LastAlerted: time.Now(), Status: "OK", Message: "",
-		PreviousStatus: "OK", Fetcher: fetcher, EmailTo: email_to,
-		Value: 0.0, RunBookLink: runbook_link,
+		PreviousStatus: "OK", fetcher: fetcher, EmailTo: emailTo,
+		Value: 0.0, RunBookLink: runbookLink,
 	}
 }
 
@@ -63,44 +63,44 @@ func cleanMetric(metric string) string {
 	return re.ReplaceAllString(metric, "")
 }
 
-func (a Alert) Url() string {
-	return GRAPHITE_BASE + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + WINDOW
+func (a alert) URL() string {
+	return graphiteBase + "?target=keepLastValue(" + a.Metric + ")&format=raw&from=-" + window
 }
 
-func (a Alert) DailyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" +
+func (a alert) DailyGraphURL() string {
+	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +
-		"&height=" + fmt.Sprintf("%d", DAILY_GRAPH_HEIGHT) +
-		"&bgcolor=" + DAILY_BGCOLOR +
-		"&fgcolor=" + FGCOLOR + "&hideGrid=true&colorList=" +
-		DAILY_COLORLIST + "&from=-24hours"
+		")&width=" + fmt.Sprintf("%d", graphWidth) +
+		"&height=" + fmt.Sprintf("%d", dailyGraphHeight) +
+		"&bgcolor=" + dailyBgColor +
+		"&fgcolor=" + fgColor + "&hideGrid=true&colorList=" +
+		dailyColorlist + "&from=-24hours"
 }
 
-func (a Alert) WeeklyGraphUrl() string {
-	return GRAPHITE_BASE + "?target=" +
+func (a alert) WeeklyGraphURL() string {
+	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", GRAPH_WIDTH) +
-		"&height=" + fmt.Sprintf("%d", WEEKLY_GRAPH_HEIGHT) +
+		")&width=" + fmt.Sprintf("%d", graphWidth) +
+		"&height=" + fmt.Sprintf("%d", weeklyGraphHeight) +
 		"&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=" +
-		WEEKLY_BGCOLOR + "&fgcolor=" + FGCOLOR +
-		"&hideGrid=true&colorList=" + WEEKLY_COLORLIST + "&from=-7days"
+		weeklyBgColor + "&fgcolor=" + fgColor +
+		"&hideGrid=true&colorList=" + weeklyColorlist + "&from=-7days"
 }
 
-type Fetcher interface {
+type fetcher interface {
 	Get(string) (*http.Response, error)
 }
 
-type HTTPFetcher struct{}
+type httpFetcher struct{}
 
-func (h HTTPFetcher) Get(url string) (*http.Response, error) {
+func (h httpFetcher) Get(url string) (*http.Response, error) {
 	return http.Get(url)
 }
 
-func (a *Alert) Fetch() (float64, error) {
-	resp, err := a.Fetcher.Get(a.Url())
+func (a *alert) Fetch() (float64, error) {
+	resp, err := a.fetcher.Get(a.URL())
 	if err != nil {
 		a.Status = "Error"
 		a.Message = "graphite request failed"
@@ -121,7 +121,7 @@ func (a *Alert) Fetch() (float64, error) {
 	return lv, err
 }
 
-func (a *Alert) CheckMetric() bool {
+func (a *alert) CheckMetric() bool {
 	lv, err := a.Fetch()
 	if err != nil {
 		return false
@@ -131,7 +131,7 @@ func (a *Alert) CheckMetric() bool {
 
 }
 
-func (a *Alert) UpdateStatus(lv float64) {
+func (a *alert) UpdateStatus(lv float64) {
 	a.Value = lv
 	if a.Direction == "above" {
 		// pass if metric is below the threshold
@@ -154,31 +154,28 @@ func (a *Alert) UpdateStatus(lv float64) {
 	}
 }
 
-func (a Alert) String() string {
+func (a alert) String() string {
 	if a.Status == "OK" {
 		return fmt.Sprintf("%s\t%s [%s]", a.Status, a.Name, a.Metric)
-	} else {
-		return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 	}
+	return fmt.Sprintf("%s\t%s [%s]: %s (%s)", a.Status, a.Name, a.Metric, a.Message, a.LastAlerted)
 }
 
-func (a Alert) RenderDirection() string {
+func (a alert) RenderDirection() string {
 	if a.Status == "OK" {
 		if a.Direction == "above" {
 			return "<"
-		} else {
-			return ">"
 		}
-	} else {
-		if a.Direction == "above" {
-			return ">"
-		} else {
-			return "<"
-		}
+		return ">"
 	}
+	if a.Direction == "above" {
+		return ">"
+	}
+	return "<"
+
 }
 
-func (a Alert) BootstrapStatus() string {
+func (a alert) BootstrapStatus() string {
 	if a.Status == "OK" {
 		return "OK"
 	}
@@ -188,106 +185,104 @@ func (a Alert) BootstrapStatus() string {
 	return "warning"
 }
 
-func (a Alert) GlyphIcon() string {
+func (a alert) GlyphIcon() string {
 	if a.Type == "Notice" {
 		return "glyphicon-info-sign"
-	} else {
-		return "glyphicon-warning-sign"
 	}
+	return "glyphicon-warning-sign"
+
 }
 
-func (a *Alert) SendRecoveryMessage() {
+func (a *alert) SendRecoveryMessage() {
 	log.WithFields(
 		log.Fields{
 			"name": a.Name,
 		},
 	).Debug("sending Recovery Message")
-	simpleSendMail(EMAIL_FROM,
+	simpleSendMail(emailFrom,
 		a.EmailTo,
 		a.RecoveryEmailSubject(),
 		a.RecoveryEmailBody())
 }
 
-func (a *Alert) RecoveryEmailSubject() string {
+func (a *alert) RecoveryEmailSubject() string {
 	return fmt.Sprintf("[RECOVERED] %s", a.Name)
 }
 
-func (a *Alert) RecoveryEmailBody() string {
+func (a *alert) RecoveryEmailBody() string {
 	return fmt.Sprintf("%s [%s] has returned %s %f", a.Name, a.Metric, invertDirection(a.Direction), a.Threshold)
 }
 
 func invertDirection(d string) string {
 	if d == "above" {
 		return "below"
-	} else {
-		return "above"
 	}
+	return "above"
 }
 
-func (a *Alert) Throttled() bool {
+func (a *alert) Throttled() bool {
 	if a.Backoff == 0 {
 		return false
 	}
-	d := backoff_time(a.Backoff)
+	d := backoffTime(a.Backoff)
 	window := a.LastAlerted.Add(d)
 	return time.Now().Before(window)
 }
 
-func (a *Alert) SendAlert() {
+func (a *alert) SendAlert() {
 	log.WithFields(
 		log.Fields{
 			"name": a.Name,
 		},
 	).Debug("Sending Alert")
-	simpleSendMail(EMAIL_FROM,
+	simpleSendMail(emailFrom,
 		a.EmailTo,
-		a.AlertEmailSubject(),
-		a.AlertEmailBody())
+		a.alertEmailSubject(),
+		a.alertEmailBody())
 }
 
-func (a *Alert) AlertEmailSubject() string {
+func (a *alert) alertEmailSubject() string {
 	if a.Type == "Alert" {
 		return fmt.Sprintf("[ALERT] %s", a.Name)
-	} else {
-		return fmt.Sprintf("[NOTICE] %s", a.Name)
 	}
+	return fmt.Sprintf("[NOTICE] %s", a.Name)
 }
 
-func (a *Alert) IncludeRunBookLink() string {
+func (a *alert) IncludeRunBookLink() string {
 	if a.RunBookLink == "" {
 		return ""
 	}
 	return fmt.Sprintf("\n\nRunbook link:\n%s\n", a.RunBookLink)
 }
 
-func (a *Alert) AlertEmailBody() string {
+func (a *alert) alertEmailBody() string {
 	return fmt.Sprintf("%s [%s] has triggered an alert\nStatus:\t%s\nMessage:\t%s\n\nDaily Graph: <%s>\nWeekly Graph: <%s>%s\n",
-		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphUrl(), a.WeeklyGraphUrl(), a.IncludeRunBookLink())
+		a.Name, a.Metric, a.Status, a.Message, a.DailyGraphURL(), a.WeeklyGraphURL(), a.IncludeRunBookLink())
 }
 
 // did this alert just return to a healthy state?
 // returns 1 if just recovered, 0 otherwise
-func (a *Alert) JustRecovered() bool {
+func (a *alert) JustRecovered() bool {
 	return a.PreviousStatus == "Failed" || a.PreviousStatus == "Error"
 }
 
-func (a *Alert) SendRecoveryMessageIfNeeded(recoveries_sent int) {
-	if a.JustRecovered() && recoveries_sent < GLOBAL_THROTTLE {
+func (a *alert) SendRecoveryMessageIfNeeded(recoveriesSent int) {
+	if a.JustRecovered() && recoveriesSent < globalThrottle {
 		a.SendRecoveryMessage()
 	}
 }
 
-func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
+func (a *alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 	successes := 0
 	errors := 0
 	failures := 0
-	alerts_sent := 0
+	alertsSent := 0
 
 	if a.Status == "OK" {
 		successes++
-		a.SendRecoveryMessageIfNeeded(recoveries_sent)
+		a.SendRecoveryMessageIfNeeded(recoveriesSent)
 		if a.JustRecovered() {
-			recoveries_sent++
+			recoveriesSent++
 		}
 		a.Backoff = 0
 	} else {
@@ -302,24 +297,24 @@ func (a *Alert) UpdateState(recoveries_sent int) (int, int, int, int, int) {
 			// wait for the throttling to expire
 			log.WithFields(
 				log.Fields{
-					"recoveries_sent": recoveries_sent,
+					"recoveriesSent": recoveriesSent,
 				},
 			).Debug("throttled")
 		} else {
-			if a.Status == "Failed" && alerts_sent < GLOBAL_THROTTLE {
+			if a.Status == "Failed" && alertsSent < globalThrottle {
 				a.SendAlert()
-				alerts_sent++
+				alertsSent++
 			}
-			a.Backoff = intmin(a.Backoff+1, len(BACKOFF_DURATIONS))
+			a.Backoff = intmin(a.Backoff+1, len(backoffDurations))
 			a.LastAlerted = time.Now()
 		}
 	}
 	// cycle the previous status
 	a.PreviousStatus = a.Status
-	return successes, recoveries_sent, errors, failures, alerts_sent
+	return successes, recoveriesSent, errors, failures, alertsSent
 }
 
-func (a Alert) Hash() string {
+func (a alert) Hash() string {
 	h := sha1.New()
 	io.WriteString(h, fmt.Sprintf("metric: %s", a.Metric))
 	io.WriteString(h, fmt.Sprintf("direction: %s", a.Direction))
@@ -328,9 +323,9 @@ func (a Alert) Hash() string {
 	return fmt.Sprintf("%x", h.Sum(nil))[0:10]
 }
 
-func extractLastValue(raw_response string) (float64, error) {
+func extractLastValue(rawResponse string) (float64, error) {
 	// just take the most recent value
-	parts := strings.Split(strings.Trim(raw_response, "\n\t "), ",")
+	parts := strings.Split(strings.Trim(rawResponse, "\n\t "), ",")
 	return strconv.ParseFloat(parts[len(parts)-1], 64)
 }
 
@@ -355,10 +350,10 @@ func simpleSendMail(from, to, subject string, body string) error {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
-	s := fmt.Sprintf("%s:%d", SMTP_SERVER, SMTP_PORT)
-	auth := smtp.PlainAuth("", SMTP_USER, SMTP_PASSWORD, SMTP_SERVER)
+	s := fmt.Sprintf("%s:%d", smtpServer, smtpPort)
+	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpServer)
 
-	if SMTP_PORT == 25 {
+	if smtpPort == 25 {
 		err := SendMail(s, auth, from, []string{to}, []byte(message))
 		if err != nil {
 			log.WithFields(
@@ -369,69 +364,68 @@ func simpleSendMail(from, to, subject string, body string) error {
 			).Error("error sending mail")
 		}
 		return err
-	} else {
-		tlsconfig := &tls.Config{
-			InsecureSkipVerify: true,
-			ServerName:         SMTP_SERVER,
-		}
+	}
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         smtpServer,
+	}
 
-		conn, err := tls.Dial("tcp", s, tlsconfig)
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("tls.Dial failed")
-			return err
-		}
-
-		c, err := smtp.NewClient(conn, SMTP_SERVER)
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
-			return err
-		}
-
-		// Auth
-		if err = c.Auth(auth); err != nil {
-			log.WithFields(
-				log.Fields{
-					"err":           err,
-					"SMTP_USER":     SMTP_USER,
-					"SMTP_PASSWORD": SMTP_PASSWORD,
-					"SMTP_SERVER":   SMTP_SERVER,
-				}).Error("auth failed")
-			return err
-		}
-
-		// To && From
-		if err = c.Mail(from); err != nil {
-			log.WithFields(log.Fields{"err": err, "from": from}).Error("from address failed")
-			return err
-		}
-
-		if err = c.Rcpt(to); err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("to address failed")
-			return err
-		}
-
-		// Data
-		w, err := c.Data()
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp Data() failed")
-			return err
-		}
-
-		_, err = w.Write([]byte(message))
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp Write failed")
-			return err
-		}
-
-		err = w.Close()
-		if err != nil {
-			log.WithFields(log.Fields{"err": err}).Error("smtp close failed")
-			return err
-		}
-
-		c.Quit()
+	conn, err := tls.Dial("tcp", s, tlsconfig)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("tls.Dial failed")
 		return err
 	}
+
+	c, err := smtp.NewClient(conn, smtpServer)
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp.NewClient failed")
+		return err
+	}
+
+	// Auth
+	if err = c.Auth(auth); err != nil {
+		log.WithFields(
+			log.Fields{
+				"err":           err,
+				"SMTP_USER":     smtpUser,
+				"SMTP_PASSWORD": smtpPassword,
+				"SMTP_SERVER":   smtpServer,
+			}).Error("auth failed")
+		return err
+	}
+
+	// To && From
+	if err = c.Mail(from); err != nil {
+		log.WithFields(log.Fields{"err": err, "from": from}).Error("from address failed")
+		return err
+	}
+
+	if err = c.Rcpt(to); err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("to address failed")
+		return err
+	}
+
+	// Data
+	w, err := c.Data()
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp Data() failed")
+		return err
+	}
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp Write failed")
+		return err
+	}
+
+	err = w.Close()
+	if err != nil {
+		log.WithFields(log.Fields{"err": err}).Error("smtp close failed")
+		return err
+	}
+
+	c.Quit()
+	return err
 
 }
 
@@ -441,7 +435,7 @@ func encodeRFC2047(String string) string {
 	return strings.Trim(addr.String(), " <>")
 }
 
-var BACKOFF_DURATIONS = []time.Duration{
+var backoffDurations = []time.Duration{
 	time.Duration(5) * time.Minute,
 	time.Duration(30) * time.Minute,
 	time.Duration(1) * time.Hour,
@@ -451,6 +445,6 @@ var BACKOFF_DURATIONS = []time.Duration{
 	time.Duration(24) * time.Hour,
 }
 
-func backoff_time(level int) time.Duration {
-	return BACKOFF_DURATIONS[level]
+func backoffTime(level int) time.Duration {
+	return backoffDurations[level]
 }

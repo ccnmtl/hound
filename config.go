@@ -1,6 +1,6 @@
 package main
 
-type AlertData struct {
+type alertData struct {
 	Name        string
 	Metric      string
 	Type        string
@@ -10,6 +10,6 @@ type AlertData struct {
 	RunBookLink string
 }
 
-type ConfigData struct {
-	Alerts []AlertData
+type configData struct {
+	Alerts []alertData
 }

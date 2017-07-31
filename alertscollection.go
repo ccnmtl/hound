@@ -9,97 +9,97 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-type PageResponse struct {
+type pageResponse struct {
 	GraphiteBase string
 	MetricBase   string
-	Alerts       []*Alert
+	Alerts       []*alert
 }
 
-type IndivPageResponse struct {
+type indivPageResponse struct {
 	GraphiteBase string
 	MetricBase   string
-	Alert        *Alert
+	Alert        *alert
 }
 
-type AlertsCollection struct {
-	Alerts       []*Alert
-	AlertsByHash map[string]*Alert
-	Emailer      Emailer
+type alertsCollection struct {
+	alerts       []*alert
+	alertsByHash map[string]*alert
+	emailer      emailer
 }
 
-func NewAlertsCollection(e Emailer) *AlertsCollection {
-	return &AlertsCollection{Emailer: e, AlertsByHash: make(map[string]*Alert)}
+func newAlertsCollection(e emailer) *alertsCollection {
+	return &alertsCollection{emailer: e, alertsByHash: make(map[string]*alert)}
 }
 
-func (ac *AlertsCollection) AddAlert(a *Alert) {
-	ac.Alerts = append(ac.Alerts, a)
-	ac.AlertsByHash[a.Hash()] = a
+func (ac *alertsCollection) addAlert(a *alert) {
+	ac.alerts = append(ac.alerts, a)
+	ac.alertsByHash[a.Hash()] = a
 }
 
-func (ac *AlertsCollection) ByHash(s string) *Alert {
-	return ac.AlertsByHash[s]
+func (ac *alertsCollection) byHash(s string) *alert {
+	return ac.alertsByHash[s]
 }
 
-func (ac *AlertsCollection) CheckAll() {
-	for _, a := range ac.Alerts {
+func (ac *alertsCollection) checkAll() {
+	for _, a := range ac.alerts {
 		a.CheckMetric()
 	}
 }
 
-func (ac *AlertsCollection) ProcessAll() {
+func (ac *alertsCollection) processAll() {
 	// fetch/calculate new status for all
-	ac.CheckAll()
-	alerts_sent := 0
-	recoveries_sent := 0
+	ac.checkAll()
+	alertsSent := 0
+	recoveriesSent := 0
 	errors := 0
 	failures := 0
 	successes := 0
 
-	for _, a := range ac.Alerts {
-		s, rs, e, f, as := a.UpdateState(recoveries_sent)
+	for _, a := range ac.alerts {
+		s, rs, e, f, as := a.UpdateState(recoveriesSent)
 		successes = successes + s
-		recoveries_sent = recoveries_sent + rs
+		recoveriesSent = recoveriesSent + rs
 		errors = errors + e
 		failures = failures + f
-		alerts_sent = alerts_sent + as
+		alertsSent = alertsSent + as
 	}
-	if alerts_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.Throttled(failures, GLOBAL_THROTTLE, EMAIL_TO)
+	if alertsSent >= globalThrottle {
+		ac.emailer.Throttled(failures, globalThrottle, emailTo)
 	}
 
-	if recoveries_sent >= GLOBAL_THROTTLE {
-		ac.Emailer.RecoveryThrottled(recoveries_sent, GLOBAL_THROTTLE, EMAIL_TO)
+	if recoveriesSent >= globalThrottle {
+		ac.emailer.RecoveryThrottled(recoveriesSent, globalThrottle, emailTo)
 	}
-	ac.HandleErrors(errors)
-	LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes)
-	ExposeVars(failures, errors, successes)
+	ac.handleErrors(errors)
+	logToGraphite(alertsSent, recoveriesSent, failures, errors, successes)
+	exposeVars(failures, errors, successes)
 }
 
-func ExposeVars(failures, errors, successes int) {
-	EXP_FAILED.Set(int64(failures))
-	EXP_ERRORS.Set(int64(errors))
-	EXP_PASSED.Set(int64(successes))
-	EXP_GLOBAL_THROTTLE.Set(int64(GLOBAL_THROTTLE))
-	EXP_GLOBAL_BACKOFF.Set(int64(GLOBAL_BACKOFF))
+func exposeVars(failures, errors, successes int) {
+	expFailed.Set(int64(failures))
+	expErrors.Set(int64(errors))
+	expPassed.Set(int64(successes))
+	expGlobalThrottle.Set(int64(globalThrottle))
+	expGlobalBackoff.Set(int64(globalBackoff))
 }
 
-func (ac *AlertsCollection) HandleErrors(errors int) {
+func (ac *alertsCollection) handleErrors(errors int) {
 	if errors > 0 {
-		d := backoff_time(GLOBAL_BACKOFF)
-		window := LAST_ERROR_EMAIL.Add(d)
+		d := backoffTime(globalBackoff)
+		window := lastErrorEmail.Add(d)
 		if time.Now().After(window) {
-			ac.Emailer.EncounteredErrors(errors, EMAIL_TO)
-			LAST_ERROR_EMAIL = time.Now()
-			GLOBAL_BACKOFF = intmin(GLOBAL_BACKOFF+1, len(BACKOFF_DURATIONS))
+			ac.emailer.EncounteredErrors(errors, emailTo)
+			lastErrorEmail = time.Now()
+			globalBackoff = intmin(globalBackoff+1, len(backoffDurations))
 		}
 	} else {
-		GLOBAL_BACKOFF = 0
+		globalBackoff = 0
 	}
 }
 
-func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int) {
+func logToGraphite(alertsSent, recoveriesSent, failures, errors, successes int) {
 	var clientGraphite net.Conn
-	clientGraphite, err := net.Dial("tcp", CARBON_BASE)
+	clientGraphite, err := net.Dial("tcp", carbonBase)
 	if err != nil || clientGraphite == nil {
 		return
 	}
@@ -107,12 +107,12 @@ func LogToGraphite(alerts_sent, recoveries_sent, failures, errors, successes int
 	now := int32(time.Now().Unix())
 	buffer := bytes.NewBufferString("")
 
-	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", METRIC_BASE, alerts_sent, now)
-	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", METRIC_BASE, recoveries_sent, now)
-	fmt.Fprintf(buffer, "%sfailures %d %d\n", METRIC_BASE, failures, now)
-	fmt.Fprintf(buffer, "%serrors %d %d\n", METRIC_BASE, errors, now)
-	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", METRIC_BASE, successes, now)
-	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", METRIC_BASE, GLOBAL_BACKOFF, now)
+	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", metricBase, alertsSent, now)
+	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", metricBase, recoveriesSent, now)
+	fmt.Fprintf(buffer, "%sfailures %d %d\n", metricBase, failures, now)
+	fmt.Fprintf(buffer, "%serrors %d %d\n", metricBase, errors, now)
+	fmt.Fprintf(buffer, "%ssuccesses %d %d\n", metricBase, successes, now)
+	fmt.Fprintf(buffer, "%sglobal_backoff %d %d\n", metricBase, globalBackoff, now)
 	clientGraphite.Write(buffer.Bytes())
 }
 
@@ -123,31 +123,31 @@ func intmin(a, b int) int {
 	return b
 }
 
-func (ac *AlertsCollection) Run() {
+func (ac *alertsCollection) Run() {
 	for {
-		ac.ProcessAll()
+		ac.processAll()
 		ac.DisplayAll()
-		time.Sleep(time.Duration(CHECK_INTERVAL) * time.Minute)
+		time.Sleep(time.Duration(checkInterval) * time.Minute)
 	}
 }
 
-func (ac *AlertsCollection) DisplayAll() {
-	for _, a := range ac.Alerts {
+func (ac *alertsCollection) DisplayAll() {
+	for _, a := range ac.alerts {
 		log.Debug(a)
 	}
 }
 
-func (ac *AlertsCollection) MakePageResponse() PageResponse {
-	pr := PageResponse{GraphiteBase: GRAPHITE_BASE,
-		MetricBase: METRIC_BASE}
-	for _, a := range ac.Alerts {
+func (ac *alertsCollection) MakePageResponse() pageResponse {
+	pr := pageResponse{GraphiteBase: graphiteBase,
+		MetricBase: metricBase}
+	for _, a := range ac.alerts {
 		pr.Alerts = append(pr.Alerts, a)
 	}
 	return pr
 }
 
-func (ac *AlertsCollection) MakeIndivPageResponse(idx string) IndivPageResponse {
-	return IndivPageResponse{GraphiteBase: GRAPHITE_BASE,
-		MetricBase: METRIC_BASE,
-		Alert:      ac.ByHash(idx)}
+func (ac *alertsCollection) MakeindivPageResponse(idx string) indivPageResponse {
+	return indivPageResponse{GraphiteBase: graphiteBase,
+		MetricBase: metricBase,
+		Alert:      ac.byHash(idx)}
 }

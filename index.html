@@ -1,8 +1,13 @@
-<html>
-<head><title>Hound</title>
-<link rel="stylesheet"
-			href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-<style type="text/css">
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Hound</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+              integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+              crossorigin="anonymous">
+        <style type="text/css">
 tr.OK th { background-color: #ccffcc; }
 tr.Failed th { background-color: #ffcccc; }
 tr.Error th { background-color: #ffddcc; }
@@ -42,7 +47,7 @@ a.Error { background-color: #f60;}
         </div>
 
     <div class="table-responsive">
-<table class="table table-condensed table-striped">
+<table class="table table-sm table-striped">
 <tr>
 <th>Metric</th>
 <th></th>
@@ -52,9 +57,28 @@ a.Error { background-color: #f60;}
 
 {{ range $index, $element := .Alerts }}
 <tr class="{{ $element.BootstrapStatus }}">
-	<th><a id="alert-{{$element.Hash}}"></a><span class="glyphicon {{$element.GlyphIcon}}" aria-hidden="true"></span> {{ $element.Name }}</th>
+	<th>
+        <a id="alert-{{$element.Hash}}"></a>
+        {{if eq $element.Icon "info"}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 8 8">
+            <path d="M3 0c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1zm-1.5 2.5c-.83 0-1.5.67-1.5 1.5h1c0-.28.22-.5.5-.5s.5.22.5.5-1 1.64-1 2.5c0 .86.67 1.5 1.5 1.5s1.5-.67 1.5-1.5h-1c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-.36 1-1.84 1-2.5 0-.81-.67-1.5-1.5-1.5z" transform="translate(2)"
+            />
+        </svg>
+        {{end}}
+        {{if eq $element.Icon "warning"}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 8 8">
+            <path d="M3.09 0c-.06 0-.1.04-.13.09l-2.94 6.81c-.02.05-.03.13-.03.19v.81c0 .05.04.09.09.09h6.81c.05 0 .09-.04.09-.09v-.81c0-.05-.01-.14-.03-.19l-2.94-6.81c-.02-.05-.07-.09-.13-.09h-.81zm-.09 3h1v2h-1v-2zm0 3h1v1h-1v-1z" />
+        </svg>
+        {{end}}
+        {{$element.Name}}
+    </th>
 	<td>
-		  <a href="/alert/{{$element.Hash}}/"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span></a>
+		<a href="/alert/{{$element.Hash}}/">
+            <!-- open-iconic graph.svg -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 8 8">
+                <path d="M7.03 0l-3.03 3-1-1-3 3.03 1 1 2-2.03 1 1 4-4-.97-1zm-7.03 7v1h8v-1h-8z" />
+            </svg>
+        </a>
 	</td>
 	<td>
   {{$element.Value}} {{$element.RenderDirection}} {{$element.Threshold}}

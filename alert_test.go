@@ -69,14 +69,14 @@ func Test_AlertEmailSubject(t *testing.T) {
 	}
 }
 
-func Test_GlyphIcon(t *testing.T) {
+func Test_Icon(t *testing.T) {
 	a := newAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.GlyphIcon() != "glyphicon-warning-sign" {
-		t.Error(fmt.Sprintf("wrong value: %s", a.GlyphIcon()))
+	if a.Icon() != "warning" {
+		t.Error(fmt.Sprintf("wrong value: %s", a.Icon()))
 	}
 	a.Type = "Notice"
-	if a.GlyphIcon() != "glyphicon-info-sign" {
-		t.Error(fmt.Sprintf("wrong value: %s", a.GlyphIcon()))
+	if a.Icon() != "info" {
+		t.Error(fmt.Sprintf("wrong value: %s", a.Icon()))
 	}
 }
 

@@ -185,11 +185,11 @@ func (a alert) BootstrapStatus() string {
 	return "warning"
 }
 
-func (a alert) GlyphIcon() string {
+func (a alert) Icon() string {
 	if a.Type == "Notice" {
-		return "glyphicon-info-sign"
+		return "info"
 	}
-	return "glyphicon-warning-sign"
+	return "warning"
 
 }
 

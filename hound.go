@@ -133,30 +133,45 @@ func main() {
 		}
 	}()
 
-	bgcontext := context.Background()
-
 	f := loadConfig(configfile)
+
+	bgcontext := context.Background()
 	s, alertscancel := startServices(bgcontext, f, c)
 
-	// wait for a SIGTERM
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 
-	// then gracefully shut everything down.
-	alertscancel()
+	for {
+		// wait for a signal
+		signal := <-sigs
 
-	// giving the http server 1 second to close its connections
-	ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
-	defer cancel()
+		// shut everything down nicely
+		// then gracefully shut everything down.
+		alertscancel()
 
-	if err = s.Shutdown(ctx); err != nil {
-		log.WithFields(
-			log.Fields{
-				"error": fmt.Sprintf("%v", err),
-			}).Fatal("graceful shutdown failed")
-	} else {
-		log.Info("successful graceful shutdown")
+		// giving the http server 1 second to close its connections
+		ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
+
+		if err = s.Shutdown(ctx); err != nil {
+			log.WithFields(
+				log.Fields{
+					"error": fmt.Sprintf("%v", err),
+				}).Fatal("graceful shutdown failed")
+		} else {
+			log.Info("successful graceful shutdown")
+		}
+		cancel()
+		if signal == syscall.SIGHUP {
+			// reload config and restart services
+			f = loadConfig(configfile)
+			log.Info("re-read config")
+			s, alertscancel = startServices(bgcontext, f, c)
+			log.Info("restarted services")
+		} else {
+			// SIGINT or SIGTERM. We're done.
+			log.Info("exiting")
+			return
+		}
 	}
 }
 
@@ -174,18 +189,9 @@ func loadConfig(configfile string) configData {
 	return f
 }
 
-func startServices(ctx context.Context, f configData, c config) (*http.Server, context.CancelFunc) {
-	// initialize all the alerts
-	ac := newAlertsCollection(smtpEmailer{})
-	for _, a := range f.Alerts {
-		emailTo := a.EmailTo
-		if emailTo == "" {
-			emailTo = c.EmailTo
-		}
-		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
-	}
-
-	http.HandleFunc("/",
+func registerHandlers(ac *alertsCollection, c config) *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			pr := ac.MakePageResponse()
 
@@ -198,7 +204,7 @@ func startServices(ctx context.Context, f configData, c config) (*http.Server, c
 			t.Execute(w, pr)
 		})
 
-	http.HandleFunc("/alert/",
+	mux.HandleFunc("/alert/",
 		func(w http.ResponseWriter, r *http.Request) {
 			stringIdx := strings.Split(r.URL.String(), "/")[2]
 			pr := ac.MakeindivPageResponse(stringIdx)
@@ -214,20 +220,40 @@ func startServices(ctx context.Context, f configData, c config) (*http.Server, c
 			}
 			t.Execute(w, pr)
 		})
-	s := &http.Server{
-		Addr:         ":" + c.HTTPPort,
-		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
-	}
+	return mux
+}
 
+func startAlertsCollection(ctx context.Context, f configData, c config) (*alertsCollection, context.CancelFunc) {
+	// initialize all the alerts
+	ac := newAlertsCollection(smtpEmailer{})
+	for _, a := range f.Alerts {
+		emailTo := a.EmailTo
+		if emailTo == "" {
+			emailTo = c.EmailTo
+		}
+		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
+	}
 	alertsctx, alertscancel := context.WithCancel(ctx)
 
 	// kick off alerts in the background
 	go ac.Run(alertsctx)
 
+	return ac, alertscancel
+}
+
+func startServices(ctx context.Context, f configData, c config) (*http.Server, context.CancelFunc) {
+	ac, alertscancel := startAlertsCollection(ctx, f, c)
+	mux := registerHandlers(ac, c)
+	s := &http.Server{
+		Addr:         ":" + c.HTTPPort,
+		Handler:      mux,
+		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
+	}
+
 	// and the http server in the background
 	go func() {
-		log.Fatal(s.ListenAndServe())
+		s.ListenAndServe()
 	}()
 
 	return s, alertscancel

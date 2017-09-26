@@ -154,9 +154,6 @@ func main() {
 		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
 	}
 
-	// kick it off in the background
-	go ac.Run()
-
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			pr := ac.MakePageResponse()
@@ -191,14 +188,28 @@ func main() {
 		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
 	}
+
+	bgcontext := context.Background()
+	alertsctx, alertscancel := context.WithCancel(bgcontext)
+
+	// kick off alerts in the background
+	go ac.Run(alertsctx)
+
+	// and the http server in the background
 	go func() {
 		log.Fatal(s.ListenAndServe())
 	}()
+
+	// wait for a SIGTERM
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-
 	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+
+	// then gracefully shut everything down.
+	alertscancel()
+
+	// giving the http server 1 second to close its connections
+	ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
 	defer cancel()
 
 	if err = s.Shutdown(ctx); err != nil {

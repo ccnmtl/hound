@@ -75,8 +75,6 @@ func main() {
 	flag.StringVar(&configfile, "config", "./config.json", "JSON config file")
 	flag.Parse()
 
-	f := loadConfig(configfile)
-
 	var c config
 	err := envconfig.Process("hound", &c)
 	if err != nil {
@@ -136,6 +134,8 @@ func main() {
 	}()
 
 	bgcontext := context.Background()
+
+	f := loadConfig(configfile)
 	s, alertscancel := startServices(bgcontext, f, c)
 
 	// wait for a SIGTERM

@@ -75,19 +75,10 @@ func main() {
 	flag.StringVar(&configfile, "config", "./config.json", "JSON config file")
 	flag.Parse()
 
-	file, err := ioutil.ReadFile(configfile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	f := configData{}
-	err = json.Unmarshal(file, &f)
-	if err != nil {
-		log.Fatal(err)
-	}
+	f := loadConfig(configfile)
 
 	var c config
-	err = envconfig.Process("hound", &c)
+	err := envconfig.Process("hound", &c)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -167,6 +158,20 @@ func main() {
 	} else {
 		log.Info("successful graceful shutdown")
 	}
+}
+
+func loadConfig(configfile string) configData {
+	file, err := ioutil.ReadFile(configfile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f := configData{}
+	err = json.Unmarshal(file, &f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return f
 }
 
 func startServices(ctx context.Context, f configData, c config) (*http.Server, context.CancelFunc) {

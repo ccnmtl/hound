@@ -144,6 +144,32 @@ func main() {
 		}
 	}()
 
+	bgcontext := context.Background()
+	s, alertscancel := startServices(bgcontext, f, c)
+
+	// wait for a SIGTERM
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	<-stop
+
+	// then gracefully shut everything down.
+	alertscancel()
+
+	// giving the http server 1 second to close its connections
+	ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
+	defer cancel()
+
+	if err = s.Shutdown(ctx); err != nil {
+		log.WithFields(
+			log.Fields{
+				"error": fmt.Sprintf("%v", err),
+			}).Fatal("graceful shutdown failed")
+	} else {
+		log.Info("successful graceful shutdown")
+	}
+}
+
+func startServices(ctx context.Context, f configData, c config) (*http.Server, context.CancelFunc) {
 	// initialize all the alerts
 	ac := newAlertsCollection(smtpEmailer{})
 	for _, a := range f.Alerts {
@@ -189,8 +215,7 @@ func main() {
 		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
 	}
 
-	bgcontext := context.Background()
-	alertsctx, alertscancel := context.WithCancel(bgcontext)
+	alertsctx, alertscancel := context.WithCancel(ctx)
 
 	// kick off alerts in the background
 	go ac.Run(alertsctx)
@@ -200,24 +225,5 @@ func main() {
 		log.Fatal(s.ListenAndServe())
 	}()
 
-	// wait for a SIGTERM
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-	<-stop
-
-	// then gracefully shut everything down.
-	alertscancel()
-
-	// giving the http server 1 second to close its connections
-	ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
-	defer cancel()
-
-	if err = s.Shutdown(ctx); err != nil {
-		log.WithFields(
-			log.Fields{
-				"error": fmt.Sprintf("%v", err),
-			}).Fatal("graceful shutdown failed")
-	} else {
-		log.Info("successful graceful shutdown")
-	}
+	return s, alertscancel
 }

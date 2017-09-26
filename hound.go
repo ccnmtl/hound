@@ -1,6 +1,7 @@
 package main // import "github.com/ccnmtl/hound"
 
 import (
+	"context"
 	"encoding/json"
 	"expvar"
 	"flag"
@@ -8,7 +9,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -187,5 +191,22 @@ func main() {
 		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
 	}
-	log.Fatal(s.ListenAndServe())
+	go func() {
+		log.Fatal(s.ListenAndServe())
+	}()
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	if err = s.Shutdown(ctx); err != nil {
+		log.WithFields(
+			log.Fields{
+				"error": fmt.Sprintf("%v", err),
+			}).Fatal("graceful shutdown failed")
+	} else {
+		log.Info("successful graceful shutdown")
+	}
 }

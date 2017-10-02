@@ -1,6 +1,7 @@
 package main // import "github.com/ccnmtl/hound"
 
 import (
+	"context"
 	"encoding/json"
 	"expvar"
 	"flag"
@@ -8,7 +9,10 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -71,19 +75,8 @@ func main() {
 	flag.StringVar(&configfile, "config", "./config.json", "JSON config file")
 	flag.Parse()
 
-	file, err := ioutil.ReadFile(configfile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	f := configData{}
-	err = json.Unmarshal(file, &f)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	var c config
-	err = envconfig.Process("hound", &c)
+	err := envconfig.Process("hound", &c)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -140,20 +133,65 @@ func main() {
 		}
 	}()
 
-	// initialize all the alerts
-	ac := newAlertsCollection(smtpEmailer{})
-	for _, a := range f.Alerts {
-		emailTo := a.EmailTo
-		if emailTo == "" {
-			emailTo = c.EmailTo
+	f := loadConfig(configfile)
+
+	bgcontext := context.Background()
+	s, alertscancel := startServices(bgcontext, f, c)
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+
+	for {
+		// wait for a signal
+		signal := <-sigs
+
+		// shut everything down nicely
+		// then gracefully shut everything down.
+		alertscancel()
+
+		// giving the http server 1 second to close its connections
+		ctx, cancel := context.WithTimeout(bgcontext, 1*time.Second)
+
+		if err = s.Shutdown(ctx); err != nil {
+			log.WithFields(
+				log.Fields{
+					"error": fmt.Sprintf("%v", err),
+				}).Fatal("graceful shutdown failed")
+		} else {
+			log.Info("successful graceful shutdown")
 		}
-		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
+		cancel()
+		if signal == syscall.SIGHUP {
+			// reload config and restart services
+			f = loadConfig(configfile)
+			log.Info("re-read config")
+			s, alertscancel = startServices(bgcontext, f, c)
+			log.Info("restarted services")
+		} else {
+			// SIGINT or SIGTERM. We're done.
+			log.Info("exiting")
+			return
+		}
+	}
+}
+
+func loadConfig(configfile string) configData {
+	file, err := ioutil.ReadFile(configfile)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// kick it off in the background
-	go ac.Run()
+	f := configData{}
+	err = json.Unmarshal(file, &f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return f
+}
 
-	http.HandleFunc("/",
+func registerHandlers(ac *alertsCollection, c config) *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			pr := ac.MakePageResponse()
 
@@ -166,7 +204,7 @@ func main() {
 			t.Execute(w, pr)
 		})
 
-	http.HandleFunc("/alert/",
+	mux.HandleFunc("/alert/",
 		func(w http.ResponseWriter, r *http.Request) {
 			stringIdx := strings.Split(r.URL.String(), "/")[2]
 			pr := ac.MakeindivPageResponse(stringIdx)
@@ -182,10 +220,41 @@ func main() {
 			}
 			t.Execute(w, pr)
 		})
+	return mux
+}
+
+func startAlertsCollection(ctx context.Context, f configData, c config) (*alertsCollection, context.CancelFunc) {
+	// initialize all the alerts
+	ac := newAlertsCollection(smtpEmailer{})
+	for _, a := range f.Alerts {
+		emailTo := a.EmailTo
+		if emailTo == "" {
+			emailTo = c.EmailTo
+		}
+		ac.addAlert(newAlert(a.Name, a.Metric, a.Type, a.Threshold, a.Direction, httpFetcher{}, emailTo, a.RunBookLink))
+	}
+	alertsctx, alertscancel := context.WithCancel(ctx)
+
+	// kick off alerts in the background
+	go ac.Run(alertsctx)
+
+	return ac, alertscancel
+}
+
+func startServices(ctx context.Context, f configData, c config) (*http.Server, context.CancelFunc) {
+	ac, alertscancel := startAlertsCollection(ctx, f, c)
+	mux := registerHandlers(ac, c)
 	s := &http.Server{
 		Addr:         ":" + c.HTTPPort,
+		Handler:      mux,
 		ReadTimeout:  time.Duration(c.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(c.WriteTimeout) * time.Second,
 	}
-	log.Fatal(s.ListenAndServe())
+
+	// and the http server in the background
+	go func() {
+		s.ListenAndServe()
+	}()
+
+	return s, alertscancel
 }

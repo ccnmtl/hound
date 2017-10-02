@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net"
 	"time"
@@ -123,11 +124,15 @@ func intmin(a, b int) int {
 	return b
 }
 
-func (ac *alertsCollection) Run() {
+func (ac *alertsCollection) Run(ctx context.Context) {
 	for {
-		ac.processAll()
-		ac.DisplayAll()
-		time.Sleep(time.Duration(checkInterval) * time.Minute)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(time.Duration(checkInterval) * time.Minute):
+			ac.processAll()
+			ac.DisplayAll()
+		}
 	}
 }
 

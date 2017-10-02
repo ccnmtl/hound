@@ -20,7 +20,7 @@ coverage.html: coverage.out
 	go tool cover -html=coverage.out -o coverage.html
 
 build:
-	docker run --rm -v $(ROOT_DIR):/src -v /var/run/docker.sock:/var/run/docker.sock centurylink/golang-builder ccnmtl/hound
+	docker build -t ccnmtl/hound .
 
 push: build
 	docker push ccnmtl/hound

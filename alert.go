@@ -96,8 +96,22 @@ type fetcher interface {
 type httpFetcher struct{}
 
 func (h httpFetcher) Get(url string) (*http.Response, error) {
-	client := http.Client{ Timeout: time.Second * 2 }
-	return client.Get(url)
+	client := http.Client{Timeout: time.Second * 2}
+
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": fmt.Sprintf("%v", err),
+		}).Error("error creating request object to graphite")
+	}
+
+	// If basic auth username and password are configured, use them.
+	if graphiteBasicAuthUser != "" && graphiteBasicAuthPassword != "" {
+		req.SetBasicAuth(graphiteBasicAuthUser, graphiteBasicAuthPassword)
+	}
+
+	return client.Do(req)
 }
 
 func (a *alert) Fetch() (float64, error) {

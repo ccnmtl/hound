@@ -20,21 +20,23 @@ import (
 )
 
 var (
-	graphiteBase   string
-	carbonBase     string
-	metricBase     string
-	emailFrom      string
-	emailTo        string
-	checkInterval  int
-	globalThrottle int
-	globalBackoff  int
-	lastErrorEmail time.Time
-	emailOnError   bool
-	smtpServer     string
-	smtpPort       int
-	smtpUser       string
-	smtpPassword   string
-	window         string
+	graphiteBase              string
+	graphiteBasicAuthUser     string
+	graphiteBasicAuthPassword string
+	carbonBase                string
+	metricBase                string
+	emailFrom                 string
+	emailTo                   string
+	checkInterval             int
+	globalThrottle            int
+	globalBackoff             int
+	lastErrorEmail            time.Time
+	emailOnError              bool
+	smtpServer                string
+	smtpPort                  int
+	smtpUser                  string
+	smtpPassword              string
+	window                    string
 )
 
 var (
@@ -47,25 +49,27 @@ var (
 )
 
 type config struct {
-	GraphiteBase      string `envconfig:"GRAPHITE_BASE"`
-	CarbonBase        string `envconfig:"CARBON_BASE"`
-	MetricBase        string `envconfig:"METRIC_BASE"`
-	EmailFrom         string `envconfig:"EMAIL_FROM"`
-	EmailTo           string `envconfig:"EMAIL_TO"`
-	CheckInterval     int    `envconfig:"CHECK_INTERVAL"`
-	GlobalThrottle    int    `envconfig:"GLOBAL_THROTTLE"`
-	HTTPPort          string `envconfig:"HTTP_PORT"`
-	TemplateFile      string `envconfig:"TEMPLATE_FILE"`
-	AlertTemplateFile string `envconfig:"ALERT_TEMPLATE_FILE"`
-	EmailOnError      bool   `envconfig:"EMAIL_ON_ERROR"`
-	SMTPServer        string `envconfig:"SMTP_SERVER"`
-	SMTPPort          int    `envconfig:"SMTP_PORT"`
-	SMTPUser          string `envconfig:"SMTP_USER"`
-	SMTPPassword      string `envconfig:"SMTP_PASSWORD"`
-	LogLevel          string `envconfig:"LOG_LEVEL"`
-	ReadTimeout       int    `envconfig:"READ_TIMEOUT"`
-	WriteTimeout      int    `envconfig:"WRITE_TIMEOUT"`
-	Window            string `envconfig:"WINDOW"`
+	GraphiteBase              string `envconfig:"GRAPHITE_BASE"`
+	GraphiteBasicAuthUser     string `envconfig:"GRAPHITE_BASIC_AUTH_USER"`
+	GraphiteBasicAuthPassword string `envconfig:"GRAPHITE_BASIC_AUTH_PASSWORD"`
+	CarbonBase                string `envconfig:"CARBON_BASE"`
+	MetricBase                string `envconfig:"METRIC_BASE"`
+	EmailFrom                 string `envconfig:"EMAIL_FROM"`
+	EmailTo                   string `envconfig:"EMAIL_TO"`
+	CheckInterval             int    `envconfig:"CHECK_INTERVAL"`
+	GlobalThrottle            int    `envconfig:"GLOBAL_THROTTLE"`
+	HTTPPort                  string `envconfig:"HTTP_PORT"`
+	TemplateFile              string `envconfig:"TEMPLATE_FILE"`
+	AlertTemplateFile         string `envconfig:"ALERT_TEMPLATE_FILE"`
+	EmailOnError              bool   `envconfig:"EMAIL_ON_ERROR"`
+	SMTPServer                string `envconfig:"SMTP_SERVER"`
+	SMTPPort                  int    `envconfig:"SMTP_PORT"`
+	SMTPUser                  string `envconfig:"SMTP_USER"`
+	SMTPPassword              string `envconfig:"SMTP_PASSWORD"`
+	LogLevel                  string `envconfig:"LOG_LEVEL"`
+	ReadTimeout               int    `envconfig:"READ_TIMEOUT"`
+	WriteTimeout              int    `envconfig:"WRITE_TIMEOUT"`
+	Window                    string `envconfig:"WINDOW"`
 }
 
 func main() {
@@ -98,6 +102,8 @@ func main() {
 	log.Info("running on ", c.HTTPPort)
 	// set global values
 	graphiteBase = c.GraphiteBase
+	graphiteBasicAuthUser = c.GraphiteBasicAuthUser
+	graphiteBasicAuthPassword = c.GraphiteBasicAuthPassword
 	carbonBase = c.CarbonBase
 	metricBase = c.MetricBase
 	emailFrom = c.EmailFrom

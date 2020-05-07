@@ -2,7 +2,7 @@ ROOT_DIR:=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 all: hound
 
-hound: hound.go smtp.go alert.go alertscollection.go config.go
+hound: hound.go alert.go alertscollection.go config.go
 	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' .
 
 fmt:

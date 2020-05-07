@@ -359,7 +359,7 @@ func simpleSendMail(from, to, subject string, body string) error {
 	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpServer)
 
 	if smtpPort == 25 {
-		err := SendMail(s, auth, from, []string{to}, []byte(message))
+		err := smtp.SendMail(s, auth, from, []string{to}, []byte(message))
 		if err != nil {
 			log.WithFields(
 				log.Fields{

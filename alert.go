@@ -96,7 +96,8 @@ type fetcher interface {
 type httpFetcher struct{}
 
 func (h httpFetcher) Get(url string) (*http.Response, error) {
-	return http.Get(url)
+	client := http.Client{ Timeout: time.Second * 2 }
+	return client.Get(url)
 }
 
 func (a *alert) Fetch() (float64, error) {
@@ -118,6 +119,10 @@ func (a *alert) Fetch() (float64, error) {
 		a.Status = "Error"
 		a.Message = err.Error()
 	}
+
+	// Close the response
+	resp.Body.Close()
+
 	return lv, err
 }
 

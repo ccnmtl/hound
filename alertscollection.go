@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math"
 	"net"
 	"time"
 
@@ -142,10 +143,18 @@ func (ac *alertsCollection) DisplayAll() {
 	}
 }
 
+func roundToFourPlaces(n float64) float64 {
+	return math.Round(n * 10000) / 10000
+}
+
 func (ac *alertsCollection) MakePageResponse() pageResponse {
 	pr := pageResponse{GraphiteBase: graphiteBase,
 		MetricBase: metricBase}
 	for _, a := range ac.alerts {
+		// Format floats to four decimal places for display.
+		a.Value = roundToFourPlaces(a.Value)
+		a.Threshold = roundToFourPlaces(a.Threshold)
+
 		pr.Alerts = append(pr.Alerts, a)
 	}
 	return pr

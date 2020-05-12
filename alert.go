@@ -96,7 +96,7 @@ type fetcher interface {
 type httpFetcher struct{}
 
 func (h httpFetcher) Get(url string) (*http.Response, error) {
-	client := http.Client{Timeout: time.Second * 2}
+	client := http.Client{Timeout: time.Second * 10}
 
 	req, err := http.NewRequest("GET", url, nil)
 

@@ -39,14 +39,14 @@ func Test_URL(t *testing.T) {
 
 func Test_DailyGraphURL(t *testing.T) {
 	a := newAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.DailyGraphURL() != "?target=foo&target=threshold(10.000000)&width=800&height=150&bgcolor=FFFFFF&fgcolor=000000&hideGrid=true&colorList=%23999999,%23006699&from=-24hours" {
+	if a.DailyGraphURL() != "?target=foo&target=threshold(10.000000)&width=1600&height=300&fontSize=20&bgcolor=FFFFFF&fgcolor=000000&hideGrid=true&colorList=%23999999,%23006699&from=-24hours" {
 		t.Error(fmt.Sprintf("wrong value: %s", a.DailyGraphURL()))
 	}
 }
 
 func Test_WeeklyGraphURL(t *testing.T) {
 	a := newAlert("foo", "foo", "", 10, "above", DummyFetcher{}, "test@example.com", "")
-	if a.WeeklyGraphURL() != "?target=foo&target=threshold(10.000000)&width=800&height=75&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=EEEEEE&fgcolor=000000&hideGrid=true&colorList=%23cccccc,%236699cc&from=-7days" {
+	if a.WeeklyGraphURL() != "?target=foo&target=threshold(10.000000)&width=1600&height=150&fontSize=20&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=EEEEEE&fgcolor=000000&hideGrid=true&colorList=%23cccccc,%236699cc&from=-7days" {
 		t.Error(fmt.Sprintf("wrong value: %s", a.WeeklyGraphURL()))
 	}
 }

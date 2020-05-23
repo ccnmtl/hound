@@ -71,8 +71,9 @@ func (a alert) DailyGraphURL() string {
 	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", graphWidth) +
-		"&height=" + fmt.Sprintf("%d", dailyGraphHeight) +
+		")&width=" + fmt.Sprintf("%d", graphWidth * 2) +
+		"&height=" + fmt.Sprintf("%d", dailyGraphHeight * 2) +
+		"&fontSize=20" +
 		"&bgcolor=" + dailyBgColor +
 		"&fgcolor=" + fgColor + "&hideGrid=true&colorList=" +
 		dailyColorlist + "&from=-24hours"
@@ -82,8 +83,9 @@ func (a alert) WeeklyGraphURL() string {
 	return graphiteBase + "?target=" +
 		a.Metric + "&target=threshold(" +
 		fmt.Sprintf("%f", a.Threshold) +
-		")&width=" + fmt.Sprintf("%d", graphWidth) +
-		"&height=" + fmt.Sprintf("%d", weeklyGraphHeight) +
+		")&width=" + fmt.Sprintf("%d", graphWidth * 2) +
+		"&height=" + fmt.Sprintf("%d", weeklyGraphHeight * 2) +
+		"&fontSize=20" +
 		"&hideGrid=true&hideLegend=true&graphOnly=true&hideAxes=true&bgcolor=" +
 		weeklyBgColor + "&fgcolor=" + fgColor +
 		"&hideGrid=true&colorList=" + weeklyColorlist + "&from=-7days"

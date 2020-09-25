@@ -16,7 +16,7 @@ email when the metric has recovered.
 
 There is a docker image for running hound and postfix. See
 <https://github.com/ccnmtl/postfix-docker>,
-<https://hub.docker.com/r/hopsoft/graphite-statsd/> and
+<https://hub.docker.com/r/graphiteapp/graphite-statsd> and
 <https://github.com/ccnmtl/hound/blob/master/Dockerfile> for more information.
 
 ### Without docker

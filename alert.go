@@ -121,12 +121,14 @@ func (a *alert) Fetch() (float64, error) {
 	if err != nil {
 		a.Status = "Error"
 		a.Message = "graphite request failed"
-		return 0.0, errors.New("graphite request failed")
+		log.Debug(a.Message)
+		return 0.0, errors.New(a.Message)
 	}
 	if resp.Status != "200 OK" {
 		a.Status = "Error"
 		a.Message = "graphite did not return 200 OK"
-		return 0.0, errors.New("graphite did not return 200 OK")
+		log.Debug(a.Message)
+		return 0.0, errors.New(a.Message)
 	}
 	b, _ := ioutil.ReadAll(resp.Body)
 	s := fmt.Sprintf("%s", b)
@@ -134,6 +136,7 @@ func (a *alert) Fetch() (float64, error) {
 	if err != nil {
 		a.Status = "Error"
 		a.Message = err.Error()
+		log.Debug(a.Message)
 	}
 
 	// Close the response
@@ -145,6 +148,8 @@ func (a *alert) Fetch() (float64, error) {
 func (a *alert) CheckMetric() bool {
 	lv, err := a.Fetch()
 	if err != nil {
+		log.Debug("CheckMetric error")
+		log.Debug(err)
 		return false
 	}
 	a.UpdateStatus(lv)
@@ -310,6 +315,8 @@ func (a *alert) UpdateState(recoveriesSent int) (int, int, int, int, int) {
 		// this one is broken. if we're not in a backoff period
 		// we need to send a message
 		if a.Status == "Error" {
+			log.Debug("Error!")
+			log.Debug(a)
 			errors++
 		} else {
 			failures++

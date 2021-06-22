@@ -58,6 +58,9 @@ func (ac *alertsCollection) processAll() {
 	successes := 0
 
 	for _, a := range ac.alerts {
+		if a.Status == "Error" {
+			log.Debug(a.Message)
+		}
 		s, rs, e, f, as := a.UpdateState(recoveriesSent)
 		successes = successes + s
 		recoveriesSent = recoveriesSent + rs
@@ -109,6 +112,18 @@ func logToGraphite(alertsSent, recoveriesSent, failures, errors, successes int) 
 	now := int32(time.Now().Unix())
 	buffer := bytes.NewBufferString("")
 
+	log.WithFields(
+		log.Fields{
+			"successes": successes,
+		},
+	).Debug("logging successes")
+
+	log.WithFields(
+		log.Fields{
+			"errors": errors,
+		},
+	).Debug("logging errors")
+
 	fmt.Fprintf(buffer, "%salerts_sent %d %d\n", metricBase, alertsSent, now)
 	fmt.Fprintf(buffer, "%srecoveries_sent %d %d\n", metricBase, recoveriesSent, now)
 	fmt.Fprintf(buffer, "%sfailures %d %d\n", metricBase, failures, now)
@@ -138,9 +153,9 @@ func (ac *alertsCollection) Run(ctx context.Context) {
 }
 
 func (ac *alertsCollection) DisplayAll() {
-	for _, a := range ac.alerts {
-		log.Debug(a)
-	}
+	//for _, a := range ac.alerts {
+		//log.Debug(a)
+	//}
 }
 
 func roundToFourPlaces(n float64) float64 {
